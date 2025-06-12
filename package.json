@@ -10,6 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@floating-ui/react-dom-interactions": "^0.13.3",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@hookform/error-message": "^2.0.1",
     "@types/jest": "^29.5.14",
     "@types/node": "^24.0.0",
@@ -17,6 +23,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.57.0",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.2"
   },
   "devDependencies": {

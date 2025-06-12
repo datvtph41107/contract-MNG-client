@@ -3,10 +3,11 @@
     padding: 0;
     height: 100%;
     overflow-x: hidden;
-    /* Không cần đặt font-size ở đây */
+    --text-main: rgb(153, 153, 153);
+    --text-black: rgb(23, 23, 23);
+    --text-active: rgb(230, 66, 40);
 }
 
-/* Reset mặc định */
 *,
 *::before,
 *::after {
@@ -15,16 +16,14 @@
     padding: 0;
 }
 
-/* HTML */
 html {
-    font-size: 62.5%; /* ✅ 1rem = 10px */
+    font-size: 62.5%;
     overflow-x: hidden;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Inter", sans-serif;
 }
 
-/* Body */
 body {
-    font-size: 1.6rem; /* ✅ 16px */
+    font-size: 1.6rem;
     line-height: 1.5;
     text-rendering: optimizeSpeed;
     overflow-x: hidden;
@@ -32,7 +31,17 @@ body {
     padding: 0;
 }
 
-/* Scrollbar tùy chỉnh */
+a {
+    text-decoration: none;
+    color: black;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 html *::-webkit-scrollbar {
     width: 8px;
 }
