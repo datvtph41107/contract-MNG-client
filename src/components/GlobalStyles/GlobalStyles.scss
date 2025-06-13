@@ -6,6 +6,8 @@
     --text-main: rgb(153, 153, 153);
     --text-black: rgb(23, 23, 23);
     --text-active: rgb(230, 66, 40);
+    --text-op: #5a5a5a;
+    --text-blur: #5e5e5ea1;
 }
 
 *,
@@ -34,6 +36,7 @@ body {
 a {
     text-decoration: none;
     color: black;
+    outline: none;
 }
 
 ul {
@@ -51,4 +54,30 @@ html *::-webkit-scrollbar-thumb {
 }
 html *::-webkit-scrollbar-track {
     background-color: transparent;
+}
+
+body {
+    .tippy-box {
+        background-color: #fff;
+        color: #333;
+        border-radius: 12px;
+        // padding: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        font-weight: 500;
+        line-height: 2.2rem;
+        // max-width: 320px;
+        transition: all 0.3s ease;
+    }
+
+    .tippy-arrow {
+        color: #fff;
+    }
+
+    .tippy-box[data-placement^="bottom"] > .tippy-arrow::before {
+        top: -8px;
+    }
+
+    .tippy-box[data-theme~="custom"] {
+        border: none;
+    }
 }

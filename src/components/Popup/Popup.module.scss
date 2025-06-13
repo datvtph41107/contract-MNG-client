@@ -1,40 +1,10 @@
-.trigger {
-    display: inline-block;
-    cursor: pointer;
-}
-
 .popup {
-    pointer-events: auto;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 8px;
-    z-index: 999;
-    min-width: 180px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background-color: white;
 }
 
-.popup-sub-menu {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.tippy-content {
+}
 
-    .popup-sub-item {
-        padding: 8px 12px;
-
-        &:hover {
-            background-color: #f2f2f2;
-        }
-
-        &.active {
-            background-color: #e6f0ff;
-            font-weight: bold;
-        }
-
-        .popup-sub-item-link {
-            text-decoration: none;
-            color: #333;
-            display: block;
-        }
-    }
+.tippy-box {
+    background-color: red;
 }

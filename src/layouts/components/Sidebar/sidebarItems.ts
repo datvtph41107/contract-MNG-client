@@ -1,14 +1,14 @@
 import type { IconType } from "react-icons";
 import { BiSolidDashboard } from "react-icons/bi";
-import { RiContractLine } from "react-icons/ri";
 import { AiOutlineSetting } from "react-icons/ai";
 import { AiOutlineUsergroupDelete } from "react-icons/ai";
+import { RiNotification3Line } from "react-icons/ri";
 import { LuMails } from "react-icons/lu";
 // Mục đơn
 interface MenuItem {
     label: string;
     icon?: IconType;
-    path: string;
+    path?: string;
 }
 
 interface MenuSection {
@@ -21,7 +21,7 @@ export type SidebarItem = MenuItem | MenuSection;
 
 export const sidebarItems: SidebarItem[] = [
     { label: "Dashboard", path: "/dashboard", icon: BiSolidDashboard },
-    { label: "Integrations", path: "/integrations", icon: RiContractLine },
+    { label: "Notifications", icon: RiNotification3Line },
     { label: "Settings", path: "/settings", icon: AiOutlineSetting },
     {
         icon: AiOutlineUsergroupDelete,

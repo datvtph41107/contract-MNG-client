@@ -10,16 +10,18 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     const [showChildren, setShowChildren] = useState(true);
 
     useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth <= 768) {
-                setCollapsed(true);
-            } else {
-                setCollapsed(false);
-            }
+        const mediaQuery = window.matchMedia("(max-width: 768px)");
+
+        const handleMediaChange = (e: MediaQueryListEvent) => {
+            setCollapsed(e.matches);
+            setShowChildren(!e.matches);
         };
-        handleResize();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+
+        setCollapsed(mediaQuery.matches);
+        setShowChildren(!mediaQuery.matches);
+
+        mediaQuery.addEventListener("change", handleMediaChange);
+        return () => mediaQuery.removeEventListener("change", handleMediaChange);
     }, []);
 
     const handleToggleSidebar = () => {
@@ -37,10 +39,13 @@ const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <aside className={cx("sidebar", { collapsed })}>
                 <Sidebar collapsed={collapsed} showChildren={showChildren} onToggle={handleToggleSidebar} />
             </aside>
-            <div className={cx("main")}>
+            <div className={cx("main", { collapsed })}>
                 <div className={cx("main-board")}>
                     <header className={cx("header")}>
-                        <h1 className={cx("page-title")}>Vendor Directory</h1>
+                        <div>
+                            <h1 className={cx("page-title")}>Dasboard</h1>
+                        </div>
+                        <p>Last updated 24 minutes ago</p>
                     </header>
                     <main className={cx("content")}>{children}</main>
                 </div>

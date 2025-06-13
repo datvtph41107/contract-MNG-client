@@ -6,10 +6,14 @@
 }
 
 .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
     width: 270px;
-    // border-right: 1px solid #e5e7eb;
     padding: 1rem 1rem;
     transition: all 0.3s ease;
+    z-index: 1002;
 
     &.collapsed {
         width: 86px;
@@ -27,30 +31,53 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     min-width: 0;
+    margin-left: 270px;
+    @media (max-width: 768px) {
+        margin-left: 86px;
+        padding-top: 0.5rem;
+    }
+
+    &.collapsed {
+        margin-left: 86px;
+    }
+
+    &.collapsed {
+        margin-left: 86px;
+    }
 
     .main-board {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
         border-top-left-radius: 12px;
-        border-left: 1px;
-        border-top: 1px;
-        border-style: solid;
-        border-bottom: transparent;
-        border-right: transparent;
-        border-color: #6b6b6b;
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
         background-color: #fff;
+        overflow: hidden;
+
+        height: calc(100dvh - 1rem); // 100% chiều cao trừ đi padding
+        @media (max-width: 768px) {
+            height: calc(100dvh - 0.5rem);
+        }
     }
 }
 
 .header {
-    padding: 1rem 1.5rem 0 1.5rem;
+    padding: 0 2.6rem 0 2.6rem;
     height: 64px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     border-bottom: 1px solid #e5e7eb;
     position: sticky;
     top: 0;
     z-index: 10;
+
+    p {
+        color: var(--text-op);
+        font-size: 1.2rem;
+        margin-top: 0.4rem;
+    }
 }
 
 .page-title {
@@ -61,7 +88,7 @@
 
 .content {
     flex: 1;
-    padding: 1.5rem;
+    padding: 0 2.6rem;
     overflow-y: auto;
 
     @media (max-width: 768px) {
