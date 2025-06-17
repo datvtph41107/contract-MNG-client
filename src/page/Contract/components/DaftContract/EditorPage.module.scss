@@ -4,36 +4,39 @@
     background: #ffffff;
     flex-shrink: 0;
     border-radius: 10px;
-    padding: 6rem 4rem 4rem;
-    width: 794px;
+    width: 816px;
+    min-width: 816px;
     min-height: 1123px; // 🆕 giống khổ A4 dọc
     box-shadow: 0 0 0 1px #eee;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-
     @media (max-width: 1024px) {
-        width: 794px;
+        width: 816px;
+        min-width: 816px;
     }
 
     @media (max-width: 768px) {
-        width: 794px;
+        width: 816px;
+        min-width: 816px;
     }
 
     @media (max-width: 600px) {
-        width: 794px;
+        width: 816px;
+        min-width: 816px;
     }
 }
 
+.editor-control-group {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
 .page-tag {
-    position: absolute;
-    top: 1rem;
-    left: 2rem;
+    // position: absolute;
     background: var(--dark-main);
     color: white;
     font-size: 12px;
-    padding: 2px 6px;
+    padding: 2px 10px;
     border-radius: 6px;
 
     @media (max-width: 768px) {
@@ -45,9 +48,6 @@
 .page-control {
     display: flex;
     align-items: center;
-    position: absolute;
-    top: 1rem;
-    right: 2rem;
 
     .page-control_box {
         background: var(--dark-main);

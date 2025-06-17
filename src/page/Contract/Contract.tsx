@@ -1,9 +1,10 @@
 import styles from "./Contract.module.scss";
 import classNames from "classnames/bind";
-import SidebarLeft from "./components/daftContract/SidebarLeft";
-import SidebarRight from "./components/daftContract/SidebarRight";
-import HeaderBar from "./components/daftContract/HeaderBar";
-import EditorPage from "./components/daftContract/EditorPage";
+import SidebarLeft from "./components/DaftContract/SidebarLeft";
+import SidebarRight from "./components/DaftContract/SidebarRight";
+import HeaderBar from "./components/DaftContract/HeaderBar";
+import EditorPage from "./components/DaftContract/EditorPage";
+import { Editor } from "~/components/Editor/Editor";
 const cx = classNames.bind(styles);
 
 const pages = [
@@ -14,7 +15,7 @@ const pages = [
 
 const Contract = () => {
     return (
-        <div className={cx("layout")}>
+        <div className={cx("layout", "print-layout")}>
             {/* Header */}
             <div className={cx("layout-head")}>
                 <HeaderBar />
@@ -33,6 +34,7 @@ const Contract = () => {
                         <EditorPage />
                         <EditorPage />
                     </div>
+                    {/* <Editor /> */}
                 </main>
 
                 {/* Right Panel */}

@@ -1,0 +1,88 @@
+.editor-print {
+    width: 100%;
+    // overflow-x: auto;
+    // background-color: #f9fbfd;
+    // padding-left: 1rem;
+    // padding-right: 1rem;
+
+    @media print {
+        padding: 0 !important;
+        background-color: white !important;
+        overflow: visible !important;
+        margin: 0 !important;
+    }
+}
+
+.editor-print_formal {
+    width: 816px;
+    min-width: 816px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: center;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+
+    @media print {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+    }
+}
+
+.editor-content {
+    outline: none;
+    background-color: white;
+
+    min-height: 1054px;
+    width: 816px;
+    padding-top: 2.5rem;
+    padding-right: 3.5rem;
+    padding-bottom: 2.5rem;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    cursor: text;
+
+    @media print {
+        border: 0;
+    }
+}
+
+// toolbar
+.bubble-menu {
+    display: flex;
+    gap: 6px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    button {
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 4px 6px;
+        color: #333;
+
+        &.active {
+            color: #007bff;
+        }
+
+        &:hover {
+            background: #f1f1f1;
+        }
+    }
+}
+.floating-menu {
+    display: flex;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px;
+    position: relative;
+    z-index: 10;
+}

@@ -15,7 +15,7 @@ interface CreateContractLayoutProps {
 const CreateContractLayout: React.FC<CreateContractLayoutProps> = ({ children }) => {
     return (
         <div className={cx("wrapper")}>
-            <div className={cx("header")}>
+            <div className={cx("header", "print-area")}>
                 <Link to={routes.dashboard} className={cx("head-box")}>
                     <div className={cx("tooltip")}>
                         <FontAwesomeIcon icon={faRightToBracket} />
