@@ -45,6 +45,8 @@ const SidebarSection = ({
             <div className={cx("section-title-wrapper")}>
                 {collapsed ? (
                     <Popup
+                        trigger="click"
+                        offsetValue={{ mainAxis: 20, crossAxis: 40 }}
                         placement="right"
                         content={
                             <div className={cx("popup-content-list")}>

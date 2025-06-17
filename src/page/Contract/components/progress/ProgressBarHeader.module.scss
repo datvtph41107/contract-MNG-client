@@ -1,0 +1,108 @@
+.wrapper {
+    padding: 24px;
+    background: white;
+    border-radius: 12px;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 40px auto;
+    max-width: 800px;
+    position: relative;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    text-align: center;
+
+    @media (max-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .icon-circle {
+        border-radius: 50%;
+        padding: 2px;
+    }
+
+    .icon-circle_box {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        font-size: 16px;
+
+        @media (max-width: 768px) {
+            margin-right: 12px;
+        }
+    }
+
+    .label {
+        margin-top: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #1a1a1a;
+
+        @media (max-width: 768px) {
+            margin-top: 0;
+        }
+    }
+}
+
+.step.completed .icon-circle_box {
+    background-color: #dff6e3;
+    color: #2ecc71;
+}
+
+.step.active .icon-circle {
+    background-color: transparent;
+    color: white;
+    border: 2px dashed #2ecc71;
+}
+
+.step.active .icon-circle_box {
+    background-color: #2ecc71;
+    color: white;
+    border: 2px dashed #2ecc71;
+}
+
+.step.upcoming .icon-circle_box {
+    background-color: #d3d3d3;
+    color: white;
+}
+
+.line {
+    position: absolute;
+    top: 18px;
+    left: -36%;
+    width: 72%;
+    height: 2px;
+    z-index: 1;
+    background-color: #d3d3d3;
+
+    @media (max-width: 768px) {
+        display: none;
+    }
+}
+
+.line.completed {
+    background-color: #2ecc71;
+}

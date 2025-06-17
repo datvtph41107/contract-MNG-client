@@ -5,6 +5,9 @@ export const routes = {
     adminLogin: "/admin/login",
 
     managerDashboard: "/manager/dashboard",
+
+    createContract: "/page/create",
+    contract: "/page/create/daft",
 };
 
 // Routes cho Admin

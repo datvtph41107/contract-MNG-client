@@ -1,0 +1,144 @@
+.overview-card {
+    background: var(--bg-sub);
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .overview-card_contain {
+        background-color: white;
+        border-radius: 6px;
+        padding: 1.6rem 1.8rem;
+        border: 1px solid rgba(201, 200, 200, 0.52);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title-group {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-size: 1.4rem;
+
+        .title-group_avatar {
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            background-color: rgba(172, 172, 172, 0.535);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+        }
+
+        .title-estimate {
+            font-size: 1.4rem;
+            color: var(--text-label);
+        }
+    }
+
+    .completion {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        .completion-label {
+            color: var(--text-label);
+            font-size: 1.4rem;
+        }
+        .completion-label_progress {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            .completion-label_progress-icon {
+                color: #29a37e;
+                font-size: 1.4rem;
+            }
+
+            .completion-label_percent {
+                font-weight: bold;
+                font-size: 1.4rem;
+            }
+        }
+    }
+}
+
+.status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    font-size: 1.2rem;
+    color: var(--text-label);
+    .status-label_main {
+        color: black;
+        font-weight: bold;
+    }
+    .assigned {
+        color: black;
+        font-weight: 500;
+    }
+}
+
+.blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-width: 100%;
+}
+
+.block {
+    width: 15px;
+    height: 15px;
+    background-color: var(--green-block);
+    border-radius: 2px;
+}
+
+.progress-audit {
+    margin-top: 2rem;
+
+    .progress-audit_des {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        h4 {
+            font-size: 1.4rem;
+        }
+
+        .progress-audit_box {
+            color: var(--text-label);
+            font-size: 1.4rem;
+        }
+    }
+}
+.progress-stages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); // Tự chia theo số lượng stage
+    gap: 4px;
+    margin-top: 12px;
+}
+
+.stage {
+    display: flex;
+    flex-direction: column;
+
+    span {
+        color: #333;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .line {
+        width: 100%;
+        height: 6px;
+        background-color: var(--green-block);
+        border-radius: 2px;
+        margin-bottom: 1rem;
+    }
+}

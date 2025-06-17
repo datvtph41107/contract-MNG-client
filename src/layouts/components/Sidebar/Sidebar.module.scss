@@ -388,7 +388,6 @@
     pointer-events: none;
     transform: translateX(10px);
     transition: all 0.2s ease;
-
     z-index: 999;
 }
 
@@ -413,6 +412,7 @@
     padding: 0.4rem 0;
 
     .popup-section {
+        font-size: 1.4rem;
         color: var(--text-active);
         font-weight: bold;
         padding: 8px 4px;
