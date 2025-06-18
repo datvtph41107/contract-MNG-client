@@ -96,7 +96,7 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ pages }) => {
                 </div>
             </div>
 
-            {/* <div className={cx("section")}>
+            <div className={cx("section")}>
                 <div className={cx("styling-section")}>
                     <div className={cx("header_left")}>
                         <span className={cx("header_left-navigator")}>Styling</span>
@@ -132,7 +132,7 @@ const SidebarLeft: React.FC<SidebarLeftProps> = ({ pages }) => {
                         </div>
                     </div>
                 </div>
-            </div> */}
+            </div>
         </div>
     );
 };

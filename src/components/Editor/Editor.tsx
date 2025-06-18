@@ -91,7 +91,7 @@ export const Editor = () => {
 
     return (
         <div className={cx("editor-wrapper")}>
-            {editor && <Toolbar />}
+            <Toolbar />
             <EditorContent editor={editor} />
         </div>
     );

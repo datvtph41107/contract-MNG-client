@@ -3,40 +3,46 @@ import { type Level } from "@tiptap/extension-heading";
 import { FloatingMenu } from "@tiptap/react";
 import * as Dialog from "@radix-ui/react-dialog";
 import classNames from "classnames/bind";
+
 import {
-    AlignCenterIcon,
-    AlignJustifyIcon,
-    AlignLeftIcon,
-    AlignRightIcon,
-    BoldIcon,
-    ChevronDownIcon,
-    HighlighterIcon,
-    ImageIcon,
-    ItalicIcon,
-    Link2Icon,
-    ListCollapseIcon,
-    ListIcon,
-    ListOrderedIcon,
-    ListTodoIcon,
-    MessageSquarePlusIcon,
-    MinusIcon,
-    PlusIcon,
-    PrinterIcon,
-    Redo2Icon,
-    RemoveFormattingIcon,
-    SearchIcon,
-    SpellCheckIcon,
-    UnderlineIcon,
-    Undo2Icon,
-    UploadIcon,
-    type LucideIcon,
-} from "lucide-react";
+    faBold,
+    faItalic,
+    faUnderline,
+    faUndo,
+    faRedo,
+    faPrint,
+    faSpellCheck,
+    faHighlighter,
+    faLink,
+    faList,
+    faListOl,
+    faListCheck,
+    faCommentDots,
+    faEraser,
+    faAlignLeft,
+    faAlignCenter,
+    faAlignRight,
+    faAlignJustify,
+    faChevronDown,
+    faMinus,
+    faPlus,
+    faImage,
+    faUpload,
+    faMagnifyingGlass,
+    faFont,
+    faTextHeight,
+    faStrikethrough,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styles from "./Toolbar.module.scss";
 import { useEditorStore } from "~/store/editor-store";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import React, { useState } from "react";
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 const cx = classNames.bind(styles);
+
+const IconButton = ({ icon }: { icon: IconProp }) => <FontAwesomeIcon icon={icon} className={cx("icon")} />;
 
 const LineHeightButton = () => {
     const { editor } = useEditorStore();
@@ -53,7 +59,9 @@ const LineHeightButton = () => {
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
                 <button className={cx("trigger")}>
-                    <ListCollapseIcon />
+                    <button className={cx("trigger")}>
+                        <IconButton icon={faTextHeight} />
+                    </button>
                 </button>
             </DropdownMenu.Trigger>
 
@@ -120,9 +128,9 @@ const FontSizeButton = () => {
     };
 
     return (
-        <div className="font-size-controller">
-            <button onClick={decrement} className="font-size-btn">
-                <MinusIcon className="icon" />
+        <div className={cx("font-size-controller")}>
+            <button onClick={decrement} className={cx("font-size-btn")}>
+                <FontAwesomeIcon icon={faMinus} className={cx("icon")} />
             </button>
 
             {isEditing ? (
@@ -132,7 +140,7 @@ const FontSizeButton = () => {
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     onKeyDown={handleKeyDown}
-                    className="font-size-input"
+                    className={cx("font-size-input")}
                 />
             ) : (
                 <button
@@ -140,14 +148,14 @@ const FontSizeButton = () => {
                         setIsEditing(true);
                         setFontSize(currentFontSize);
                     }}
-                    className="font-size-display"
+                    className={cx("font-size-display")}
                 >
                     {currentFontSize}
                 </button>
             )}
 
-            <button onClick={increment} className="font-size-btn">
-                <PlusIcon className="icon" />
+            <button onClick={increment} className={cx("font-size-btn")}>
+                <FontAwesomeIcon icon={faPlus} className={cx("icon")} />
             </button>
         </div>
     );
@@ -159,14 +167,14 @@ const ListButton = () => {
     const lists = [
         {
             label: "Bullet List",
-            icon: ListIcon,
+            icon: faList,
             isActive: () => editor?.isActive("bulletList"),
             onClick: () => editor?.chain().focus().toggleBulletList().run(),
         },
         {
             label: "Ordered List",
-            icon: ListOrderedIcon,
-            isActive: () => editor?.isActive("bulletList"),
+            icon: faListOl,
+            isActive: () => editor?.isActive("orderedList"),
             onClick: () => editor?.chain().focus().toggleOrderedList().run(),
         },
     ];
@@ -175,14 +183,13 @@ const ListButton = () => {
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
                 <button className={cx("trigger")}>
-                    <ListIcon />
+                    <IconButton icon={faList} />
                 </button>
             </DropdownMenu.Trigger>
-
             <DropdownMenu.Content className={cx("dropdown")}>
-                {lists.map(({ label, icon: Icon, onClick, isActive }) => (
+                {lists.map(({ label, icon, onClick, isActive }) => (
                     <button className={cx({ active: isActive() })} key={label} onClick={onClick}>
-                        <Icon />
+                        <FontAwesomeIcon icon={icon} className={cx("icon")} />
                         <span>{label}</span>
                     </button>
                 ))}
@@ -198,22 +205,22 @@ const AlignButton = () => {
         {
             label: "Align Left",
             value: "left",
-            icon: AlignLeftIcon,
+            icon: faAlignLeft,
         },
         {
             label: "Align Center",
             value: "center",
-            icon: AlignCenterIcon,
+            icon: faAlignCenter,
         },
         {
             label: "Align Right",
             value: "right",
-            icon: AlignRightIcon,
+            icon: faAlignRight,
         },
         {
             label: "Align Justify",
             value: "justify",
-            icon: AlignJustifyIcon,
+            icon: faAlignJustify,
         },
     ];
 
@@ -221,18 +228,17 @@ const AlignButton = () => {
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
                 <button className={cx("trigger")}>
-                    <AlignLeftIcon />
+                    <IconButton icon={faAlignLeft} />
                 </button>
             </DropdownMenu.Trigger>
-
             <DropdownMenu.Content className={cx("dropdown")}>
-                {alignments.map(({ label, value, icon: Icon }) => (
+                {alignments.map(({ label, value, icon }) => (
                     <button
                         className={cx({ active: editor?.isActive({ textAlign: value }) })}
                         key={value}
                         onClick={() => editor?.chain().focus().setTextAlign(value).run()}
                     >
-                        <Icon />
+                        <FontAwesomeIcon icon={icon} className={cx("icon")} />
                         <span>{label}</span>
                     </button>
                 ))}
@@ -278,32 +284,27 @@ const ImageButton = () => {
         <>
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                    <button className="h-7 min-w-7 shrink-0 flex flex-col items-center justify-center rounded-sm hover:bg-neutral-200/80">
-                        <ImageIcon className="size-4" />
+                    <button className={cx("toolbar-btn")}>
+                        <IconButton icon={faImage} />
                     </button>
                 </DropdownMenu.Trigger>
 
-                <DropdownMenu.Content className="p-2 w-40 rounded bg-white border shadow">
-                    <DropdownMenu.Item onClick={onUpload} className="flex items-center px-2 py-1 gap-2 hover:bg-neutral-100 rounded">
-                        <UploadIcon className="size-4" />
+                <DropdownMenu.Content className={cx("dropdown")}>
+                    <DropdownMenu.Item onClick={onUpload} className={cx("dropdown-item")}>
+                        <IconButton icon={faUpload} />
                         Upload
                     </DropdownMenu.Item>
-
-                    <DropdownMenu.Item
-                        onClick={() => setIsDialogOpen(true)}
-                        className="flex items-center px-2 py-1 gap-2 hover:bg-neutral-100 rounded"
-                    >
-                        <SearchIcon className="size-4" />
-                        Paste image URL
+                    <DropdownMenu.Item onClick={() => setIsDialogOpen(true)} className={cx("dropdown-item")}>
+                        <IconButton icon={faMagnifyingGlass} /> Paste image URL
                     </DropdownMenu.Item>
                 </DropdownMenu.Content>
             </DropdownMenu.Root>
 
             <Dialog.Root open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <Dialog.Portal>
-                    <Dialog.Overlay className="fixed inset-0 bg-black/30" />
-                    <Dialog.Content className="fixed top-[30%] left-1/2 -translate-x-1/2 bg-white p-4 rounded shadow w-[90%] max-w-sm">
-                        <Dialog.Title className="text-lg font-semibold mb-2">Insert image URL</Dialog.Title>
+                    <Dialog.Overlay className={cx("dialog-overlay")} />
+                    <Dialog.Content className={cx("dialog-content")}>
+                        <Dialog.Title className={cx("dialog-title")}>Insert image URL</Dialog.Title>
 
                         <input
                             placeholder="Insert image URL"
@@ -312,10 +313,13 @@ const ImageButton = () => {
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") handleImageUrlSubmit();
                             }}
+                            className={cx("input")}
                         />
 
-                        <div className="mt-3 flex justify-end">
-                            <button onClick={handleImageUrlSubmit}>Insert</button>
+                        <div className={cx("dialog-footer")}>
+                            <button onClick={handleImageUrlSubmit} className={cx("btn")}>
+                                Insert
+                            </button>
                         </div>
                     </Dialog.Content>
                 </Dialog.Portal>
@@ -343,19 +347,20 @@ const LinkButton = () => {
         >
             <DropdownMenu.Trigger asChild>
                 <button className={cx("trigger")}>
-                    <Link2Icon />
+                    <IconButton icon={faLink} />
                 </button>
             </DropdownMenu.Trigger>
 
             <DropdownMenu.Content className={cx("dropdown")}>
-                {/* input link */}
                 <input
                     className="w-full px-2 py-1 border rounded text-sm outline-none"
                     placeholder="https://example.com"
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                 />
-                <button onClick={() => onChange(value)}></button>
+                <button onClick={() => onChange(value)} className={cx("btn")}>
+                    Apply
+                </button>
                 <p className="text-xs text-gray-500 mt-1">Value: {value}</p>
             </DropdownMenu.Content>
         </DropdownMenu.Root>
@@ -375,7 +380,7 @@ const HighLightColorButton = () => {
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
                 <button className={cx("trigger")}>
-                    <HighlighterIcon />
+                    <IconButton icon={faHighlighter} />
                 </button>
             </DropdownMenu.Trigger>
 
@@ -399,7 +404,7 @@ const TextColorButton = () => {
         <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
                 <button className={cx("trigger")}>
-                    <span className={cx("text-label")}>A</span>
+                    A
                     <div className={cx("color-preview")} style={{ backgroundColor: value }} />
                 </button>
             </DropdownMenu.Trigger>
@@ -448,7 +453,7 @@ const HeadingLevelButton = () => {
             <DropdownMenu.Trigger asChild>
                 <button className={cx("trigger")}>
                     <span className={cx("label")}>{getCurrentHeading()}</span>
-                    <ChevronDownIcon className={cx("icon")} />
+                    <IconButton icon={faChevronDown} />
                 </button>
             </DropdownMenu.Trigger>
 
@@ -486,7 +491,7 @@ const FontFamilyButton = () => {
             <DropdownMenu.Trigger asChild>
                 <button className={cx("trigger")}>
                     <span className={cx("label")}>{editor?.getAttributes("textStyle").fontFamily || "Arial"}</span>
-                    <ChevronDownIcon className={cx("icon")} />
+                    <IconButton icon={faChevronDown} />
                 </button>
             </DropdownMenu.Trigger>
 
@@ -511,13 +516,13 @@ const FontFamilyButton = () => {
 interface ToolbarButtonProps {
     onClick?: () => void;
     isActive?: boolean;
-    icon: LucideIcon;
+    icon: IconProp; // FontAwesomeIcon definition
 }
 
-const ToolbarButton = ({ onClick, isActive, icon: Icon }: ToolbarButtonProps) => {
+const ToolbarButton = ({ onClick, isActive, icon }: ToolbarButtonProps) => {
     return (
         <button className={cx("toolbar-btn", { active: isActive })} onClick={onClick}>
-            <Icon className={cx("icon")} />
+            <FontAwesomeIcon icon={icon} className={cx("icon")} />
         </button>
     );
 };
@@ -526,82 +531,91 @@ const Toolbar = () => {
     const { editor } = useEditorStore();
     const sections: {
         label: string;
-        icon: LucideIcon;
+        icon: IconProp;
         onClick: () => void;
         isActive?: boolean;
     }[][] = [
         [
             {
                 label: "Undo",
-                icon: Undo2Icon,
+                icon: faUndo,
                 onClick: () => editor?.chain().focus().undo().run(),
             },
             {
                 label: "Redo",
-                icon: Redo2Icon,
+                icon: faRedo,
                 onClick: () => editor?.chain().focus().redo().run(),
             },
-            {
-                label: "Print",
-                icon: PrinterIcon,
-                onClick: () => window.print(),
-            },
-            {
-                label: "Spell Check",
-                icon: SpellCheckIcon,
-                onClick: () => {
-                    const current = editor?.view.dom.getAttribute("spellcheck");
-                    editor?.view.dom.setAttribute("spellcheck", current === "false" ? "true" : "false");
-                },
-            },
+            // {
+            //     label: "Print",
+            //     icon: faPrint,
+            //     onClick: () => window.print(),
+            // },
+            // {
+            //     label: "Spell Check",
+            //     icon: faSpellCheck,
+            //     onClick: () => {
+            //         const current = editor?.view.dom.getAttribute("spellcheck");
+            //         editor?.view.dom.setAttribute("spellcheck", current === "false" ? "true" : "false");
+            //     },
+            // },
         ],
         [
             {
                 label: "Bold",
-                icon: BoldIcon,
+                icon: faBold,
                 isActive: editor?.isActive("bold"),
                 onClick: () => editor?.chain().focus().toggleBold().run(),
             },
             {
                 label: "Italic",
-                icon: ItalicIcon,
+                icon: faItalic,
                 isActive: editor?.isActive("italic"),
                 onClick: () => editor?.chain().focus().toggleItalic().run(),
             },
             {
                 label: "Underline",
-                icon: UnderlineIcon,
+                icon: faUnderline,
                 isActive: editor?.isActive("underline"),
                 onClick: () => editor?.chain().focus().toggleUnderline().run(),
             },
+            {
+                label: "Strikethrough",
+                icon: faStrikethrough,
+                isActive: editor?.isActive("strike"),
+                onClick: () => editor?.chain().focus().toggleStrike().run(),
+            },
         ],
         [
-            { label: "Comment", icon: MessageSquarePlusIcon, onClick: () => console.log("2323"), isActive: false },
-            {
-                label: "List Todo",
-                icon: ListTodoIcon,
-                onClick: () => editor?.chain().focus().toggleTaskList().run(),
-                isActive: editor?.isActive("taskList"),
-            },
-            {
-                label: "Remove Formatting",
-                icon: RemoveFormattingIcon,
-                onClick: () => editor?.chain().focus().unsetAllMarks().run(),
-                isActive: editor?.isActive("taskList"),
-            },
+            // {
+            //     label: "Comment",
+            //     icon: faCommentDots,
+            //     onClick: () => console.log("comment clicked"),
+            // },
+            // {
+            //     label: "List Todo",
+            //     icon: faListCheck,
+            //     onClick: () => editor?.chain().focus().toggleTaskList().run(),
+            //     isActive: editor?.isActive("taskList"),
+            // },
+            // {
+            //     label: "Remove Formatting",
+            //     icon: faEraser,
+            //     onClick: () => editor?.chain().focus().unsetAllMarks().run(),
+            // },
         ],
     ];
 
     return (
-        <FloatingMenu
-            editor={editor}
-            className={cx("floating-menu")}
-            tippyOptions={{
-                duration: 100,
-                placement: "bottom-start", // 👈 Chọn vị trí phía dưới bên trái
-                offset: [0, 8], // 👈 Cách con trỏ 8px
-            }}
-            shouldShow={({ editor }) => editor.isFocused}
+        <div
+            // editor={editor}
+            className={cx("wrapper")}
+            // tippyOptions={{
+            //     duration: 100,
+            //     placement: "bottom-start", // 👈 Chọn vị trí phía dưới bên trái
+            //     offset: [0, 8], // 👈 Cách con trỏ 8px
+            // }}
+            // shouldShow={({ editor }) => true}
         >
             {sections[0].map((item) => (
                 <ToolbarButton key={item.label} {...item} />
@@ -609,20 +623,20 @@ const Toolbar = () => {
 
             {/* TODO: Font family */}
             <div className={cx("vertical-separator")} />
-            <FontFamilyButton />
+            {/* <FontFamilyButton /> */}
             {/* TODO: Heading */}
             <div className={cx("vertical-separator")} />
             <HeadingLevelButton />
             {/* TODO: Font size */}
             <div className={cx("vertical-separator")} />
-            <FontSizeButton />
+            {/* <FontSizeButton /> */}
             <div className={cx("vertical-separator")} />
             {sections[1].map((item) => (
                 <ToolbarButton key={item.label} {...item} />
             ))}
 
             <TextColorButton />
-            <HighLightColorButton />
+            {/* <HighLightColorButton /> */}
             <div className={cx("vertical-separator")} />
             <LinkButton />
             <ImageButton />
@@ -630,10 +644,10 @@ const Toolbar = () => {
             <LineHeightButton />
             <ListButton />
 
-            {sections[2].map((item) => (
+            {/* {sections[2].map((item) => (
                 <ToolbarButton key={item.label} {...item} />
-            ))}
-        </FloatingMenu>
+            ))} */}
+        </div>
     );
 };
 

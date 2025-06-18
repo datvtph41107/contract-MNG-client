@@ -1,3 +1,7 @@
+.editor-wrapper {
+    position: relative;
+}
+
 .editor-print {
     width: 100%;
     // overflow-x: auto;
@@ -36,7 +40,7 @@
 
     min-height: 1054px;
     width: 816px;
-    padding-top: 2.5rem;
+    padding-top: 3.5rem;
     padding-right: 3.5rem;
     padding-bottom: 2.5rem;
     overflow: hidden;

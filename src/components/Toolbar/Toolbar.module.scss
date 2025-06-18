@@ -1,107 +1,99 @@
-.icon {
-    font-size: 1.4rem;
+.wrapper {
+    display: flex;
+    width: 100%;
+    gap: 6px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb; // neutral-200
+    border-radius: 4px;
+    padding: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    align-items: center;
 }
 
 .toolbar-btn {
-    // font-size: 0.875rem; // text-sm
-    height: 3rem; // h-7
-    min-width: 3rem; // min-w-7
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 6px 8px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.125rem; // rounded-sm
+    color: var(--dark-main);
+    transition: background 0.15s ease, color 0.15s ease;
+    cursor: pointer;
+
+    .icon {
+        font-size: 1.4rem;
+    }
 
     &:hover {
-        background-color: rgba(229, 229, 229, 0.8); // bg-neutral-200/80
+        background-color: rgba(244, 243, 243, 0.856); // Tailwind's gray-100
     }
 
-    &:active {
-        background-color: rgba(200, 200, 200, 0.8); // active style tùy chọn
-    }
-}
-
-.vertical-separator {
-    height: 1.5rem; // h-6
-    width: 1px; // w-px
-    background-color: #d4d4d4; // bg-neutral-300 (#d4d4d4 là mặc định của Tailwind neutral-300)
-}
-
-.floating-menu {
-    display: flex;
-    gap: 8px;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 6px 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
-    button {
-        border: none;
-        background: none;
-        cursor: pointer;
-        font-size: 14px;
-        padding: 4px 6px;
-        color: #333;
-
-        &.active {
-            color: #007bff;
-        }
-
-        &:hover {
-            background: #f2f2f2;
-        }
+    &.active {
+        background-color: #e8e9eadb; // Tailwind's gray-200
     }
 }
 
+// Optional: Style for dropdown trigger buttons
 .trigger {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 120px;
-    height: 1.75rem;
-    padding: 0 0.5rem;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 0.125rem;
+    gap: 6px;
+    padding: 6px 12px;
+    height: 32px;
+    background-color: white;
+    border: 1px solid #d1d5db; // neutral-300
+    border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
+    color: #374151; // text-gray-700
+    transition: all 0.2s ease;
 
     &:hover {
-        background-color: #f1f1f1;
+        background-color: #f3f4f6; // gray-100
+        border-color: #cbd5e1; // gray-300
+    }
+
+    &:active {
+        background-color: #e5e7eb; // gray-200
+    }
+
+    .icon {
+        font-size: 12px;
+        color: #6b7280; // gray-500
     }
 }
 
 .label {
-    overflow: hidden;
+    font-weight: 500;
     white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.caret {
-    font-size: 0.75rem;
 }
 
 .dropdown {
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 0.25rem;
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
     padding: 4px 0;
-    min-width: 120px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-width: 160px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     z-index: 10;
 }
 
 .item {
-    padding: 6px 12px;
+    padding: 8px 12px;
     font-size: 14px;
     cursor: pointer;
+    transition: background 0.15s;
 
     &:hover {
-        background-color: #f0f0f0;
+        background-color: #f9fafb;
     }
 
     &.active {
-        background-color: #dcdcdc;
-        font-weight: bold;
+        background-color: #f3f4f6;
+        font-weight: 600;
     }
 }

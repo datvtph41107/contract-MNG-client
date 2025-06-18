@@ -4,7 +4,6 @@ import SidebarLeft from "./components/DaftContract/SidebarLeft";
 import SidebarRight from "./components/DaftContract/SidebarRight";
 import HeaderBar from "./components/DaftContract/HeaderBar";
 import EditorPage from "./components/DaftContract/EditorPage";
-import { Editor } from "~/components/Editor/Editor";
 const cx = classNames.bind(styles);
 
 const pages = [
