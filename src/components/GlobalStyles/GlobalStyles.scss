@@ -8,9 +8,13 @@
     --text-main: rgb(153, 153, 153);
     --text-black: rgb(23, 23, 23);
     --text-active: rgb(230, 66, 40);
+    --text-active-hover: rgb(255, 94, 70);
     --text-op: #5a5a5a;
     --text-blur: #5e5e5ea1;
     --text-label: #787575;
+
+    --bg-hover: rgba(255, 94, 70, 0.15);
+    --bg-active: rgb(255, 94, 70);
 
     --bg-sub: rgba(244, 243, 243, 0.802);
     --dark-main: #364152;
@@ -19,6 +23,13 @@
     --gray-3: rgba(61, 37, 20, 0.12);
 
     --green-block: #29a37e;
+}
+
+.tippy-box {
+    width: 100%;
+    max-width: 100% !important;
+}
+.tippy-content {
 }
 
 *,
@@ -132,6 +143,7 @@ html *::-webkit-scrollbar-track {
         line-height: 1.1;
         margin-top: 2.5rem;
         text-wrap: pretty;
+        font-weight: normal;
     }
 
     h1,

@@ -1,3 +1,5 @@
+"use client";
+
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskItem from "@tiptap/extension-task-item";
@@ -18,35 +20,148 @@ import Toolbar from "../Toolbar";
 import classNames from "classnames/bind";
 import style from "./Editor.module.scss";
 import { useEditorStore } from "~/store/editor-store";
-import TextStyle from "@tiptap/extension-text-style";
 import { FontSizeExtension } from "./extensions/font-size";
 import { LineHeightExtension } from "./extensions/line-height";
+import { useEffect, useRef } from "react";
 
 const cx = classNames.bind(style);
 
 export const Editor = () => {
-    const { setEditor } = useEditorStore();
+    const {
+        setEditor,
+        setToolbarVisible,
+        isInteractingWithToolbar,
+        setInteractingWithToolbar,
+        clearInteractionTimeout,
+        setInteractionTimeoutId,
+    } = useEditorStore();
+
+    const editorRef = useRef<HTMLDivElement>(null);
+    const typingTimeoutRef = useRef<NodeJS.Timeout>();
+
+    // Helper function to check if current selection is on an image
+    const isImageSelected = (editor: any) => {
+        const { state } = editor;
+        const { from, to, $from } = state.selection;
+
+        // Check if selection is a NodeSelection (single node selected)
+        if (state.selection.constructor.name === "NodeSelection") {
+            const node = state.selection.node;
+            return node && node.type.name === "image";
+        }
+
+        // Check if cursor is positioned at an image node
+        const nodeAtFrom = state.doc.nodeAt(from);
+        const nodeAtTo = state.doc.nodeAt(to);
+
+        // Check if we're at the position of an image
+        if (nodeAtFrom && nodeAtFrom.type.name === "image") {
+            return true;
+        }
+
+        if (nodeAtTo && nodeAtTo.type.name === "image") {
+            return true;
+        }
+
+        // Check if we're adjacent to an image
+        const $pos = state.doc.resolve(from);
+        const nodeBefore = $pos.nodeBefore;
+        const nodeAfter = $pos.nodeAfter;
+
+        if (nodeBefore && nodeBefore.type.name === "image") {
+            return true;
+        }
+
+        if (nodeAfter && nodeAfter.type.name === "image") {
+            return true;
+        }
+
+        return false;
+    };
 
     const editor = useEditor({
         immediatelyRender: false,
         onCreate({ editor }) {
             setEditor(editor);
         },
-        onDestroy() {},
+        onDestroy() {
+            setEditor(null);
+        },
         onUpdate({ editor }) {
             setEditor(editor);
+
+            // Check if image is selected and hide toolbar if so
+            if (isImageSelected(editor)) {
+                setToolbarVisible(false);
+                return;
+            }
+
+            // Only hide toolbar when typing and not interacting with toolbar
+            if (!isInteractingWithToolbar) {
+                const { autoToggleEnabled } = useEditorStore.getState();
+
+                if (!autoToggleEnabled) return;
+
+                setToolbarVisible(false);
+
+                if (typingTimeoutRef.current) {
+                    clearTimeout(typingTimeoutRef.current);
+                }
+
+                typingTimeoutRef.current = setTimeout(() => {
+                    const currentState = useEditorStore.getState();
+                    if (currentState.autoToggleEnabled && !currentState.isInteractingWithToolbar) {
+                        setToolbarVisible(true);
+                    }
+                }, 600);
+            }
         },
+
         onSelectionUpdate({ editor }) {
             setEditor(editor);
+
+            // Hide toolbar if image is selected
+            if (isImageSelected(editor)) {
+                setToolbarVisible(false);
+                return;
+            }
+
+            // Don't hide toolbar during text selection if interacting with toolbar
+            if (!isInteractingWithToolbar) {
+                const { from, to } = editor.state.selection;
+                const hasSelection = from !== to;
+
+                if (hasSelection) {
+                    setToolbarVisible(true);
+                }
+            }
         },
-        onTransaction() {
+        onTransaction({ editor }) {
             setEditor(editor);
         },
         onFocus({ editor }) {
             setEditor(editor);
+
+            // Hide toolbar if image is selected
+            if (isImageSelected(editor)) {
+                setToolbarVisible(false);
+                return;
+            }
+
+            if (!isInteractingWithToolbar) {
+                setToolbarVisible(true);
+            }
         },
         onBlur({ editor }) {
             setEditor(editor);
+
+            // Use a longer delay and check interaction state
+            setTimeout(() => {
+                const currentState = useEditorStore.getState();
+                if (!currentState.isInteractingWithToolbar && currentState.autoToggleEnabled) {
+                    setToolbarVisible(false);
+                }
+            }, 200);
         },
         onContentError({ editor }) {
             setEditor(editor);
@@ -67,7 +182,6 @@ export const Editor = () => {
                 multicolor: true,
             }),
             FontFamily,
-            TextStyle,
             Image,
             ImageResize,
             TextAlign.configure({
@@ -84,15 +198,42 @@ export const Editor = () => {
             Underline,
         ],
         content: `
-  <p>Welcome to the editor</p>
-  <p></p>
-`,
+            <p>Welcome to the editor</p>
+        `,
     });
 
+    useEffect(() => {
+        const handleContextMenu = (e: MouseEvent) => {
+            if (editorRef.current?.contains(e.target as Node)) {
+                e.preventDefault();
+
+                const { isToolbarVisible, setToolbarVisible, setAutoToggleEnabled } = useEditorStore.getState();
+
+                if (isToolbarVisible) {
+                    setToolbarVisible(false);
+                    setAutoToggleEnabled(false);
+                } else {
+                    setToolbarVisible(true);
+                    setAutoToggleEnabled(true);
+                }
+            }
+        };
+
+        document.addEventListener("contextmenu", handleContextMenu);
+        return () => {
+            document.removeEventListener("contextmenu", handleContextMenu);
+            // Cleanup timeouts
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+            clearInteractionTimeout();
+        };
+    }, [clearInteractionTimeout]);
+
     return (
-        <div className={cx("editor-wrapper")}>
-            <Toolbar />
+        <div className={cx("editor-wrapper")} ref={editorRef}>
             <EditorContent editor={editor} />
+            {editor && <Toolbar />}
         </div>
     );
 };

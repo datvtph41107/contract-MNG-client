@@ -1,85 +1,61 @@
 .wrapper {
-    display: flex;
-    width: 100%;
-    gap: 6px;
-    background-color: #ffffff;
-    border: 1px solid #e5e7eb; // neutral-200
-    border-radius: 4px;
-    padding: 4px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    align-items: center;
-}
-
-.toolbar-btn {
-    background: transparent;
-    border: none;
-    outline: none;
-    padding: 6px 8px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--dark-main);
-    transition: background 0.15s ease, color 0.15s ease;
-    cursor: pointer;
-
-    .icon {
-        font-size: 1.4rem;
-    }
-
-    &:hover {
-        background-color: rgba(244, 243, 243, 0.856); // Tailwind's gray-100
-    }
-
-    &.active {
-        background-color: #e8e9eadb; // Tailwind's gray-200
-    }
-}
-
-// Optional: Style for dropdown trigger buttons
-.trigger {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-    padding: 6px 12px;
-    height: 32px;
-    background-color: white;
-    border: 1px solid #d1d5db; // neutral-300
+    padding: 4px 6px;
     border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #374151; // text-gray-700
-    transition: all 0.2s ease;
+    border-top: 1px solid rgba(215, 215, 215, 0.358);
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px;
+    z-index: 999 !important;
+    transition: all 0.1s ease;
+    opacity: 1;
+    transform: translateY(0);
 
-    &:hover {
-        background-color: #f3f4f6; // gray-100
-        border-color: #cbd5e1; // gray-300
+    &.hidden {
+        opacity: 0;
+        transform: translateY(-10px);
+        pointer-events: none;
     }
 
-    &:active {
-        background-color: #e5e7eb; // gray-200
+    &.visible {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        animation: toolbarFadeIn 0.1s ease-out;
     }
 
-    .icon {
-        font-size: 12px;
-        color: #6b7280; // gray-500
+    &.context-menu {
+        animation: contextMenuFadeIn 0.1s ease-out;
+        box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+        border: 1px solid rgba(215, 215, 215, 0.5);
+        min-width: 200px;
     }
+}
+
+.contain {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.context-menu-wrapper {
+    pointer-events: auto;
+
+    .wrapper {
+        position: relative;
+    }
+}
+
+.vertical-block {
+    width: 1px;
+    height: 24px;
+    background-color: #e5e7eb;
+    margin: 0 4px;
+    border-radius: 1px;
 }
 
 .label {
     font-weight: 500;
     white-space: nowrap;
-}
-
-.dropdown {
-    background-color: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    padding: 4px 0;
-    min-width: 160px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    z-index: 10;
+    font-size: 1.2rem;
 }
 
 .item {
@@ -95,5 +71,91 @@
     &.active {
         background-color: #f3f4f6;
         font-weight: 600;
+    }
+}
+
+.toolbar-btn {
+    background: transparent;
+    outline: none;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dark-main, #374151);
+    transition: all 0.15s ease;
+    cursor: pointer;
+
+    &:hover {
+        background-color: rgba(244, 243, 243, 0.856);
+    }
+
+    &.active {
+        background-color: var(--bg-hover);
+        color: var(--bg-active);
+    }
+
+    &:focus {
+        outline: 2px solid rgba(255, 94, 70, 0.3);
+        outline-offset: 1px;
+    }
+}
+
+.icon {
+    width: 14px;
+    height: 14px;
+    transition: color 0.15s ease;
+}
+
+// Animation cho toolbar fade in
+@keyframes toolbarFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Animation cho context menu
+@keyframes contextMenuFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+    .wrapper {
+        padding: 3px 4px;
+        gap: 2px;
+
+        &.context-menu {
+            min-width: 180px;
+        }
+    }
+
+    .toolbar-btn {
+        width: 28px;
+        height: 28px;
+    }
+
+    .icon {
+        width: 12px;
+        height: 12px;
+    }
+
+    .vertical-block {
+        margin: 0 2px;
+        height: 20px;
     }
 }
