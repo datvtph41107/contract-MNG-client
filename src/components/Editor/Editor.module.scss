@@ -1,13 +1,9 @@
 .editor-wrapper {
     position: relative;
     width: 100%;
-}
-
-.editor-content p {
-    margin: 0;
-    margin-bottom: 1.25rem; // khoảng cách giữa các đoạn khi Enter (20px)
-    line-height: 1.6; // dòng không quá sát nhau khi wrap
-    word-break: break-word; // không tràn ra ngoài
+    height: 100%;
+    // Ensure proper event handling
+    pointer-events: auto;
 }
 
 .editor-content {
@@ -23,6 +19,9 @@
     display: flex;
     flex-direction: column;
     cursor: text;
+    // Ensure proper event handling
+    pointer-events: auto;
+    user-select: text;
 
     @media print {
         border: 0;
@@ -30,6 +29,9 @@
 
     :global(.ProseMirror) {
         outline: none;
+        // Ensure proper event handling
+        pointer-events: auto;
+        user-select: text;
 
         p {
             margin: 0;
@@ -38,7 +40,7 @@
             word-break: break-word;
         }
 
-        // Styling cho các elements khác
+        // Styling for other elements
         h1,
         h2,
         h3,

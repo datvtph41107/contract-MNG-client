@@ -6,9 +6,11 @@ import LoginLayout from "~/layouts/LoginLayout";
 import Admin from "~/page/admin/Admin";
 import AdminLogin from "~/page/admin/AdminLogin";
 import Login from "~/page/client/Login";
-import Contract from "~/page/Contract/Contract";
-import CreateContract from "~/page/CreateContract";
+import ContractPage from "~/page/Contract/ContractPage";
 import Dashboard from "~/page/Dashboard";
+import ContractDaft from "~/page/Contract/ContractDaft";
+import ContractDetail from "~/page/Contract/ContractDetail";
+import CreateContract from "~/page/Contract/CreateContract";
 
 // Public routes
 const publicRoutes = [
@@ -18,7 +20,9 @@ const publicRoutes = [
     //Manager
     { path: config.routes.managerDashboard, component: Login, layout: DefaultLayout },
     { path: config.routes.createContract, component: CreateContract, layout: CreateContractLayout },
-    { path: config.routes.contract, component: Contract, layout: CreateContractLayout },
+    { path: config.routes.contract, component: ContractDaft, layout: CreateContractLayout },
+    { path: config.routes.contractPages, component: ContractPage, layout: DefaultLayout },
+    { path: config.routes.contractDetail, component: ContractDetail, layout: DefaultLayout },
 
     // Admin
     { path: config.routes.adminLogin, component: AdminLogin },

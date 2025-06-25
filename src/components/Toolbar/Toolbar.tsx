@@ -18,6 +18,8 @@ import {
     TextColorButton,
     LinkButton,
     ImageButton,
+    TextDecorationButton,
+    TextStyleButton,
 } from "./EditorButton/EditorButton";
 import { useEffect, useRef } from "react";
 import { NodeSelection } from "prosemirror-state";
@@ -126,18 +128,18 @@ const Toolbar = () => {
                 isActive: editor?.isActive("italic"),
                 onClick: () => editor?.chain().focus().toggleItalic().run(),
             },
-            {
-                label: "Underline",
-                icon: faUnderline,
-                isActive: editor?.isActive("underline"),
-                onClick: () => editor?.chain().focus().toggleUnderline().run(),
-            },
-            {
-                label: "Strikethrough",
-                icon: faStrikethrough,
-                isActive: editor?.isActive("strike"),
-                onClick: () => editor?.chain().focus().toggleStrike().run(),
-            },
+            // {
+            //     label: "Underline",
+            //     icon: faUnderline,
+            //     isActive: editor?.isActive("underline"),
+            //     onClick: () => editor?.chain().focus().toggleUnderline().run(),
+            // },
+            // {
+            //     label: "Strikethrough",
+            //     icon: faStrikethrough,
+            //     isActive: editor?.isActive("strike"),
+            //     onClick: () => editor?.chain().focus().toggleStrike().run(),
+            // },
         ],
     ];
 
@@ -174,7 +176,7 @@ const Toolbar = () => {
                     return false;
                 }
 
-                return hasFocus && (!isEmpty || isEmpty) && isToolbarVisible;
+                return hasFocus;
             }}
             tippyOptions={{
                 placement: "bottom-start",
@@ -213,7 +215,7 @@ const Toolbar = () => {
                 }}
                 className={cx("contain")}
             >
-                <HeadingLevelButton />
+                <TextStyleButton />
                 <div className={cx("vertical-block")} />
 
                 <TextColorButton />
@@ -221,6 +223,7 @@ const Toolbar = () => {
                 {sections[1].map((item) => (
                     <ToolbarButton key={item.label} {...item} />
                 ))}
+                <TextDecorationButton />
                 <div className={cx("vertical-block")} />
 
                 <LinkButton />

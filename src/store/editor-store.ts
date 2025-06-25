@@ -7,6 +7,8 @@ interface EditorStore {
     isInteractingWithToolbar: boolean;
     autoToggleEnabled: boolean;
     interactionTimeoutId: NodeJS.Timeout | null;
+    manualToggleOnly: boolean;
+    setManualToggleOnly: (value: boolean) => void;
     setEditor: (editor: Editor | null) => void;
     setToolbarVisible: (visible: boolean) => void;
     setInteractingWithToolbar: (interacting: boolean) => void;
@@ -21,6 +23,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     autoToggleEnabled: true,
     isInteractingWithToolbar: false,
     interactionTimeoutId: null,
+    manualToggleOnly: false,
+    setManualToggleOnly: (value) => set({ manualToggleOnly: value }),
     setEditor: (editor) => set({ editor }),
     setToolbarVisible: (visible) => set({ isToolbarVisible: visible }),
     setInteractingWithToolbar: (interacting) => {

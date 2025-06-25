@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useRef, useEffect } from "react";
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 import type { Level } from "@tiptap/extension-heading";
@@ -18,6 +16,12 @@ import {
     faMagnifyingGlass,
     faLink,
     faTextHeight,
+    faChevronUp,
+    faStrikethrough,
+    faUnderline,
+    faFont,
+    faHeading,
+    faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -72,6 +76,7 @@ export const LineHeightButton = () => {
                     <IconButton icon={faChevronDown} />
                 </button>
             }
+            size="sm"
         >
             {lineHeights.map(({ label, value }) => (
                 <div
@@ -122,6 +127,7 @@ export const ListButton = () => {
                     <IconButton icon={faChevronDown} />
                 </button>
             }
+            size="smx"
         >
             {lists.map(({ label, icon, onClick, isActive }) => (
                 <div
@@ -163,6 +169,7 @@ export const AlignButton = () => {
                     <IconButton icon={faChevronDown} />
                 </button>
             }
+            size="smx"
         >
             {alignments.map(({ label, value, icon }) => (
                 <div
@@ -485,6 +492,7 @@ export const HeadingLevelButton = () => {
                     <FontAwesomeIcon icon={faChevronDown} />
                 </button>
             }
+            size="smx"
         >
             <ul className={cx("dropdown-menu")}>
                 {headings.map(({ label, value, fontSize }) => (
@@ -507,6 +515,740 @@ export const HeadingLevelButton = () => {
                     </li>
                 ))}
             </ul>
+        </DropdownToolbar>
+    );
+};
+
+export const FontSizeButton = () => {
+    const { editor } = useEditorStore();
+    const { handleInteraction } = useToolbarInteraction();
+
+    const predefinedSizes = [
+        { label: "8", value: "8px" },
+        { label: "9", value: "9px" },
+        { label: "10", value: "10px" },
+        { label: "11", value: "11px" },
+        { label: "12", value: "12px" },
+        { label: "14", value: "14px" },
+        { label: "16", value: "16px" },
+        { label: "18", value: "18px" },
+        { label: "20", value: "20px" },
+        { label: "24", value: "24px" },
+        { label: "28", value: "28px" },
+        { label: "32", value: "32px" },
+        { label: "36", value: "36px" },
+        { label: "48", value: "48px" },
+        { label: "72", value: "72px" },
+    ];
+
+    // Improved function to get current font size
+    const getCurrentFontSize = () => {
+        if (!editor) return "16px";
+
+        // First check if there's a direct fontSize in textStyle
+        const textStyleFontSize = editor.getAttributes("textStyle").fontSize;
+        if (textStyleFontSize) {
+            return textStyleFontSize;
+        }
+
+        // Check if we're in a heading and get its computed font size
+        for (let level = 1; level <= 6; level++) {
+            if (editor.isActive("heading", { level })) {
+                // Try to get computed style from the actual DOM element
+                const { from } = editor.state.selection;
+                const dom = editor.view.domAtPos(from);
+                if (dom.node && dom.node.nodeType === Node.ELEMENT_NODE) {
+                    const element = dom.node as Element;
+                    const headingElement = element.closest(`h${level}`) || element.querySelector(`h${level}`);
+                    if (headingElement) {
+                        const computedStyle = window.getComputedStyle(headingElement);
+                        const fontSize = computedStyle.fontSize;
+                        if (fontSize) {
+                            return fontSize;
+                        }
+                    }
+                }
+
+                // Fallback to predefined heading sizes
+                const headingSizes = {
+                    1: "32px", // h1
+                    2: "24px", // h2
+                    3: "20px", // h3
+                    4: "18px", // h4
+                    5: "16px", // h5
+                    6: "14px", // h6
+                };
+                return headingSizes[level as keyof typeof headingSizes] || "16px";
+            }
+        }
+
+        // Try to get computed style from current selection
+        try {
+            const { from } = editor.state.selection;
+            const dom = editor.view.domAtPos(from);
+            if (dom.node) {
+                let element: Element | null = null;
+
+                if (dom.node.nodeType === Node.ELEMENT_NODE) {
+                    element = dom.node as Element;
+                } else if (dom.node.parentElement) {
+                    element = dom.node.parentElement;
+                }
+
+                if (element) {
+                    const computedStyle = window.getComputedStyle(element);
+                    const fontSize = computedStyle.fontSize;
+                    if (fontSize && fontSize !== "16px") {
+                        return fontSize;
+                    }
+                }
+            }
+        } catch (error) {
+            console.warn("Could not get computed font size:", error);
+        }
+
+        // Default fallback
+        return "16px";
+    };
+
+    const currentFontSize = getCurrentFontSize();
+
+    const handleFontSizeChange = (size: string) => {
+        handleInteraction(() => {
+            if (size) {
+                // Ensure the size has a unit (px, em, rem, etc.)
+                const sizeWithUnit = /^\d+$/.test(size) ? `${size}px` : size;
+                editor?.chain().focus().setFontSize(sizeWithUnit).run();
+            }
+        });
+    };
+
+    // Function to get numeric value from font size string
+    const getFontSizeNumber = (fontSize: string): number => {
+        const match = fontSize.match(/(\d+(?:\.\d+)?)/);
+        return match ? Number.parseFloat(match[1]) : 16;
+    };
+
+    // Function to get unit from font size string
+    const getFontSizeUnit = (fontSize: string): string => {
+        const match = fontSize.match(/\d+(?:\.\d+)?(\w+)/);
+        return match ? match[1] : "px";
+    };
+
+    // Increment font size
+    const incrementFontSize = () => {
+        const currentSize = getFontSizeNumber(currentFontSize);
+        const unit = getFontSizeUnit(currentFontSize);
+
+        let newSize: number;
+
+        // Smart increment based on current size
+        if (currentSize < 12) {
+            newSize = currentSize + 1;
+        } else if (currentSize < 24) {
+            newSize = currentSize + 2;
+        } else if (currentSize < 48) {
+            newSize = currentSize + 4;
+        } else {
+            newSize = currentSize + 8;
+        }
+
+        // Cap at maximum size
+        newSize = Math.min(newSize, 144);
+
+        handleFontSizeChange(`${newSize}${unit}`);
+    };
+
+    // Decrement font size
+    const decrementFontSize = () => {
+        const currentSize = getFontSizeNumber(currentFontSize);
+        const unit = getFontSizeUnit(currentFontSize);
+
+        let newSize: number;
+
+        // Smart decrement based on current size
+        if (currentSize <= 12) {
+            newSize = currentSize - 1;
+        } else if (currentSize <= 24) {
+            newSize = currentSize - 2;
+        } else if (currentSize <= 48) {
+            newSize = currentSize - 4;
+        } else {
+            newSize = currentSize - 8;
+        }
+
+        // Cap at minimum size
+        newSize = Math.max(newSize, 8);
+
+        handleFontSizeChange(`${newSize}${unit}`);
+    };
+
+    const getCurrentSizeLabel = () => {
+        const predefined = predefinedSizes.find((size) => size.value === currentFontSize);
+        return predefined ? predefined.label : getFontSizeNumber(currentFontSize).toString();
+    };
+
+    return (
+        <DropdownToolbar
+            trigger={
+                <button className={cx("trigger")}>
+                    <span className={cx("font-size-label")}>{getCurrentSizeLabel()}</span>
+                    <FontAwesomeIcon icon={faChevronDown} />
+                </button>
+            }
+        >
+            <div className={cx("font-size-dropdown")}>
+                {/* Current size indicator */}
+                <div className={cx("current-size-indicator")}>
+                    <span className={cx("current-size-text")}>Current: {currentFontSize}</span>
+                </div>
+
+                {/* Size adjustment controls */}
+                <div className={cx("size-controls")}>
+                    <div className={cx("size-display")}>
+                        <span className={cx("size-number")}>{getFontSizeNumber(currentFontSize)}</span>
+                        <span className={cx("size-unit")}>{getFontSizeUnit(currentFontSize)}</span>
+                    </div>
+                    <div className={cx("control-buttons")}>
+                        <button
+                            className={cx("control-btn")}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                incrementFontSize();
+                            }}
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
+                            disabled={getFontSizeNumber(currentFontSize) >= 144}
+                        >
+                            <FontAwesomeIcon icon={faChevronUp} />
+                        </button>
+                        <button
+                            className={cx("control-btn")}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                decrementFontSize();
+                            }}
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
+                            disabled={getFontSizeNumber(currentFontSize) <= 8}
+                        >
+                            <FontAwesomeIcon icon={faChevronDown} />
+                        </button>
+                    </div>
+                </div>
+
+                <div className={cx("divider")} />
+
+                {/* Predefined sizes */}
+                <div className={cx("predefined-sizes")}>
+                    {predefinedSizes.map(({ label, value }) => (
+                        <div
+                            key={value}
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleFontSizeChange(value);
+                            }}
+                            className={cx("dropdown-item", { active: currentFontSize === value })}
+                            style={{ fontSize: value }}
+                        >
+                            {label}px
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </DropdownToolbar>
+    );
+};
+
+export const TextDecorationButton = () => {
+    const { editor } = useEditorStore();
+    const { handleInteraction } = useToolbarInteraction();
+
+    const decorations = [
+        {
+            label: "None",
+            value: "none",
+            icon: null,
+            isActive: () => !editor?.isActive("underline") && !editor?.isActive("strike"),
+            onClick: () => {
+                // Remove both underline and strikethrough
+                editor?.chain().focus().unsetUnderline().unsetStrike().run();
+            },
+        },
+        {
+            label: "Underline",
+            value: "underline",
+            icon: faUnderline,
+            isActive: () => editor?.isActive("underline"),
+            onClick: () => {
+                // If underline is active, remove it. Otherwise, add underline and remove strikethrough
+                if (editor?.isActive("underline")) {
+                    editor?.chain().focus().unsetUnderline().run();
+                } else {
+                    editor?.chain().focus().unsetStrike().setUnderline().run();
+                }
+            },
+        },
+        {
+            label: "Strikethrough",
+            value: "strikethrough",
+            icon: faStrikethrough,
+            isActive: () => editor?.isActive("strike"),
+            onClick: () => {
+                // If strikethrough is active, remove it. Otherwise, add strikethrough and remove underline
+                if (editor?.isActive("strike")) {
+                    editor?.chain().focus().unsetStrike().run();
+                } else {
+                    editor?.chain().focus().unsetUnderline().setStrike().run();
+                }
+            },
+        },
+    ];
+
+    const getCurrentDecoration = () => {
+        if (editor?.isActive("underline")) return decorations[1];
+        if (editor?.isActive("strike")) return decorations[2];
+        return decorations[0];
+    };
+
+    const currentDecoration = getCurrentDecoration();
+
+    return (
+        <DropdownToolbar
+            trigger={
+                <button className={cx("trigger", "text-decoration-trigger")}>
+                    {currentDecoration.icon ? (
+                        <FontAwesomeIcon icon={currentDecoration.icon} />
+                    ) : (
+                        <span className={cx("none-decoration")}>T</span>
+                    )}
+                    <IconButton icon={faChevronDown} />
+                </button>
+            }
+            size="smx"
+        >
+            {decorations.map(({ label, value, icon, onClick, isActive }) => (
+                <div
+                    key={value}
+                    onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleInteraction(onClick);
+                    }}
+                    className={cx("dropdown-item", { active: isActive() })}
+                >
+                    <div className={cx("decoration-item")}>
+                        {icon ? (
+                            <FontAwesomeIcon icon={icon} className={cx("decoration-icon")} />
+                        ) : (
+                            <span className={cx("none-icon")}>T</span>
+                        )}
+                        <span className={cx("decoration-label")}>{label}</span>
+                    </div>
+                </div>
+            ))}
+        </DropdownToolbar>
+    );
+};
+
+export const FontFamilyButton = () => {
+    const { editor } = useEditorStore();
+    const { handleInteraction } = useToolbarInteraction();
+
+    const fontFamilies = [
+        {
+            label: "Default",
+            value: "",
+            category: "System",
+        },
+        {
+            label: "Arial",
+            value: "Arial, sans-serif",
+            category: "Sans Serif",
+        },
+        {
+            label: "Helvetica",
+            value: "Helvetica, Arial, sans-serif",
+            category: "Sans Serif",
+        },
+        {
+            label: "Times New Roman",
+            value: "Times New Roman, Times, serif",
+            category: "Serif",
+        },
+        {
+            label: "Georgia",
+            value: "Georgia, serif",
+            category: "Serif",
+        },
+        {
+            label: "Courier New",
+            value: "Courier New, Courier, monospace",
+            category: "Monospace",
+        },
+        {
+            label: "Verdana",
+            value: "Verdana, Geneva, sans-serif",
+            category: "Sans Serif",
+        },
+        {
+            label: "Trebuchet MS",
+            value: "Trebuchet MS, Helvetica, sans-serif",
+            category: "Sans Serif",
+        },
+        {
+            label: "Comic Sans MS",
+            value: "Comic Sans MS, cursive",
+            category: "Cursive",
+        },
+        {
+            label: "Impact",
+            value: "Impact, Charcoal, sans-serif",
+            category: "Display",
+        },
+        {
+            label: "Palatino",
+            value: "Palatino, Palatino Linotype, serif",
+            category: "Serif",
+        },
+        {
+            label: "Tahoma",
+            value: "Tahoma, Geneva, sans-serif",
+            category: "Sans Serif",
+        },
+    ];
+
+    const getCurrentFontFamily = () => {
+        if (!editor) return "Default";
+
+        const fontFamily = editor.getAttributes("textStyle").fontFamily;
+        if (!fontFamily) return "Default";
+
+        // Find matching font family
+        const matchedFont = fontFamilies.find((font) => font.value === fontFamily);
+        return matchedFont ? matchedFont.label : "Custom";
+    };
+
+    const handleFontFamilyChange = (fontFamily: string) => {
+        handleInteraction(() => {
+            if (fontFamily === "") {
+                // Remove font family (use default)
+                editor?.chain().focus().unsetFontFamily().run();
+            } else {
+                editor?.chain().focus().setFontFamily(fontFamily).run();
+            }
+        });
+    };
+
+    const currentFontFamily = getCurrentFontFamily();
+
+    // Group fonts by category
+    const groupedFonts = fontFamilies.reduce((acc, font) => {
+        if (!acc[font.category]) {
+            acc[font.category] = [];
+        }
+        acc[font.category].push(font);
+        return acc;
+    }, {} as Record<string, typeof fontFamilies>);
+
+    return (
+        <DropdownToolbar
+            size="lg"
+            trigger={
+                <button className={cx("trigger", "font-family-trigger")}>
+                    <FontAwesomeIcon icon={faFont} />
+                    <span className={cx("font-family-label")}>{currentFontFamily}</span>
+                    <IconButton icon={faChevronDown} />
+                </button>
+            }
+        >
+            <div className={cx("font-family-dropdown")}>
+                {Object.entries(groupedFonts).map(([category, fonts]) => (
+                    <div key={category} className={cx("font-category")}>
+                        <div className={cx("category-header")}>{category}</div>
+                        {fonts.map(({ label, value }) => (
+                            <div
+                                key={value || "default"}
+                                onMouseDown={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleFontFamilyChange(value);
+                                }}
+                                className={cx("dropdown-item", "font-item", {
+                                    active: currentFontFamily === label,
+                                })}
+                                style={{ fontFamily: value || "inherit" }}
+                            >
+                                <span className={cx("font-name")}>{label}</span>
+                                <span className={cx("font-preview")}>Aa</span>
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
+        </DropdownToolbar>
+    );
+};
+
+export const TextStyleButton = () => {
+    const { editor } = useEditorStore();
+    const { handleInteraction } = useToolbarInteraction();
+
+    // Collapse state for sections
+    const [collapsedSections, setCollapsedSections] = useState({
+        headings: false, // Default expanded
+        fonts: false, // Default expanded
+    });
+
+    // Toggle section collapse
+    const toggleSection = (section: "headings" | "fonts") => {
+        setCollapsedSections((prev) => ({
+            ...prev,
+            [section]: !prev[section],
+        }));
+    };
+
+    // Heading levels
+    const headings = [
+        { label: "Normal text", value: 0, fontSize: "16px", type: "heading" },
+        { label: "Heading 1", value: 1, fontSize: "20px", type: "heading" },
+        { label: "Heading 2", value: 2, fontSize: "18px", type: "heading" },
+        { label: "Heading 3", value: 3, fontSize: "16px", type: "heading" },
+        { label: "Heading 4", value: 4, fontSize: "14px", type: "heading" },
+        { label: "Heading 5", value: 5, fontSize: "13px", type: "heading" },
+    ];
+
+    // Font families
+    const fontFamilies = [
+        {
+            label: "Default",
+            value: "",
+            category: "System",
+            type: "font",
+        },
+        {
+            label: "Arial",
+            value: "Arial, sans-serif",
+            category: "Sans Serif",
+            type: "font",
+        },
+        {
+            label: "Helvetica",
+            value: "Helvetica, Arial, sans-serif",
+            category: "Sans Serif",
+            type: "font",
+        },
+        {
+            label: "Times New Roman",
+            value: "Times New Roman, Times, serif",
+            category: "Serif",
+            type: "font",
+        },
+        {
+            label: "Georgia",
+            value: "Georgia, serif",
+            category: "Serif",
+            type: "font",
+        },
+        {
+            label: "Courier New",
+            value: "Courier New, Courier, monospace",
+            category: "Monospace",
+            type: "font",
+        },
+        {
+            label: "Verdana",
+            value: "Verdana, Geneva, sans-serif",
+            category: "Sans Serif",
+            type: "font",
+        },
+        {
+            label: "Trebuchet MS",
+            value: "Trebuchet MS, Helvetica, sans-serif",
+            category: "Sans Serif",
+            type: "font",
+        },
+    ];
+
+    const getCurrentHeading = () => {
+        for (let level = 1; level <= 5; level++) {
+            if (editor?.isActive("heading", { level })) {
+                return `H${level}`;
+            }
+        }
+        return "P";
+    };
+
+    const getCurrentFontFamily = () => {
+        if (!editor) return "Default";
+
+        const fontFamily = editor.getAttributes("textStyle").fontFamily;
+        if (!fontFamily) return "Default";
+
+        const matchedFont = fontFamilies.find((font) => font.value === fontFamily);
+        return matchedFont ? matchedFont.label : "Custom";
+    };
+
+    const handleHeadingSelect = (value: number) => {
+        handleInteraction(() => {
+            if (value === 0) {
+                editor?.chain().setParagraph().run();
+            } else {
+                editor
+                    ?.chain()
+                    .toggleHeading({ level: value as Level })
+                    .focus()
+                    .run();
+            }
+        });
+    };
+
+    const handleFontFamilyChange = (fontFamily: string) => {
+        handleInteraction(() => {
+            if (fontFamily === "") {
+                editor?.chain().focus().unsetFontFamily().run();
+            } else {
+                editor?.chain().focus().setFontFamily(fontFamily).run();
+            }
+        });
+    };
+
+    const currentHeading = getCurrentHeading();
+    const currentFontFamily = getCurrentFontFamily();
+
+    // Group fonts by category
+    const groupedFonts = fontFamilies.reduce((acc, font) => {
+        if (!acc[font.category]) {
+            acc[font.category] = [];
+        }
+        acc[font.category].push(font);
+        return acc;
+    }, {} as Record<string, typeof fontFamilies>);
+
+    return (
+        <DropdownToolbar
+            size="lg"
+            trigger={
+                <button className={cx("trigger", "text-style-trigger")}>
+                    <div className={cx("text-style-info")}>
+                        <span className={cx("heading-indicator")}>{currentHeading}</span>
+                        <span className={cx("font-indicator")}>{currentFontFamily}</span>
+                    </div>
+                    <IconButton icon={faChevronDown} />
+                </button>
+            }
+        >
+            <div className={cx("text-style-dropdown")}>
+                {/* Text Styles Section */}
+                <div className={cx("style-section")}>
+                    <div
+                        className={cx("section-header", "collapsible-header")}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            toggleSection("headings");
+                        }}
+                        onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
+                    >
+                        <FontAwesomeIcon
+                            icon={collapsedSections.headings ? faChevronRight : faChevronDown}
+                            className={cx("collapse-icon")}
+                        />
+                        <FontAwesomeIcon icon={faHeading} className={cx("section-icon")} />
+                        <span>Text Styles</span>
+                        <span className={cx("section-count")}>({headings.length})</span>
+                    </div>
+                    <div className={cx("section-content", { collapsed: collapsedSections.headings })}>
+                        {!collapsedSections.headings &&
+                            headings.map(({ label, value, fontSize }) => (
+                                <div
+                                    key={value}
+                                    style={{ fontSize }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleHeadingSelect(value);
+                                    }}
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                    }}
+                                    className={cx("dropdown-item", "heading-item", {
+                                        active:
+                                            (value === 0 && !editor?.isActive("heading")) || editor?.isActive("heading", { level: value }),
+                                    })}
+                                >
+                                    {label}
+                                </div>
+                            ))}
+                    </div>
+                </div>
+
+                <div className={cx("section-divider")} />
+
+                {/* Font Families Section */}
+                <div className={cx("style-section")}>
+                    <div
+                        className={cx("section-header", "collapsible-header")}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            toggleSection("fonts");
+                        }}
+                        onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }}
+                    >
+                        <FontAwesomeIcon icon={collapsedSections.fonts ? faChevronRight : faChevronDown} className={cx("collapse-icon")} />
+                        <FontAwesomeIcon icon={faFont} className={cx("section-icon")} />
+                        <span>Font Families</span>
+                        <span className={cx("section-count")}>({fontFamilies.length})</span>
+                    </div>
+                    <div className={cx("section-content", { collapsed: collapsedSections.fonts })}>
+                        {!collapsedSections.fonts &&
+                            Object.entries(groupedFonts).map(([category, fonts]) => (
+                                <div key={category} className={cx("font-category")}>
+                                    <div className={cx("category-label")}>{category}</div>
+                                    {fonts.map(({ label, value }) => (
+                                        <div
+                                            key={value || "default"}
+                                            onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                            }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleFontFamilyChange(value);
+                                            }}
+                                            className={cx("dropdown-item", "font-item", {
+                                                active: currentFontFamily === label,
+                                            })}
+                                            style={{ fontFamily: value || "inherit" }}
+                                        >
+                                            <span className={cx("font-name")}>{label}</span>
+                                            <span className={cx("font-preview")}>Aa</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            ))}
+                    </div>
+                </div>
+            </div>
         </DropdownToolbar>
     );
 };

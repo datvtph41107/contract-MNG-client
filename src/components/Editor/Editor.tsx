@@ -34,6 +34,7 @@ export const Editor = () => {
         setInteractingWithToolbar,
         clearInteractionTimeout,
         setInteractionTimeoutId,
+        isToolbarVisible,
     } = useEditorStore();
 
     const editorRef = useRef<HTMLDivElement>(null);
@@ -88,7 +89,7 @@ export const Editor = () => {
             setEditor(null);
         },
         onUpdate({ editor }) {
-            setEditor(editor);
+            // setEditor(editor);
 
             // Check if image is selected and hide toolbar if so
             if (isImageSelected(editor)) {
@@ -118,18 +119,17 @@ export const Editor = () => {
         },
 
         onSelectionUpdate({ editor }) {
-            setEditor(editor);
-
-            // Hide toolbar if image is selected
             if (isImageSelected(editor)) {
                 setToolbarVisible(false);
                 return;
             }
 
-            // Don't hide toolbar during text selection if interacting with toolbar
             if (!isInteractingWithToolbar) {
                 const { from, to } = editor.state.selection;
                 const hasSelection = from !== to;
+
+                const { manualToggleOnly } = useEditorStore.getState();
+                if (manualToggleOnly) return; // ⚠️ Không bật toolbar nếu đang ở chế độ khóa thủ công
 
                 if (hasSelection) {
                     setToolbarVisible(true);
@@ -137,23 +137,22 @@ export const Editor = () => {
             }
         },
         onTransaction({ editor }) {
-            setEditor(editor);
+            // setEditor(editor);
         },
         onFocus({ editor }) {
             setEditor(editor);
-
-            // Hide toolbar if image is selected
             if (isImageSelected(editor)) {
                 setToolbarVisible(false);
                 return;
             }
 
-            if (!isInteractingWithToolbar) {
+            const { manualToggleOnly } = useEditorStore.getState();
+            if (!manualToggleOnly && !isInteractingWithToolbar) {
                 setToolbarVisible(true);
             }
         },
         onBlur({ editor }) {
-            setEditor(editor);
+            // setEditor(editor);
 
             // Use a longer delay and check interaction state
             setTimeout(() => {
@@ -164,7 +163,7 @@ export const Editor = () => {
             }, 200);
         },
         onContentError({ editor }) {
-            setEditor(editor);
+            // setEditor(editor);
         },
         editorProps: {
             attributes: {
@@ -207,14 +206,16 @@ export const Editor = () => {
             if (editorRef.current?.contains(e.target as Node)) {
                 e.preventDefault();
 
-                const { isToolbarVisible, setToolbarVisible, setAutoToggleEnabled } = useEditorStore.getState();
+                const { isToolbarVisible, setToolbarVisible, setAutoToggleEnabled, setManualToggleOnly } = useEditorStore.getState();
 
                 if (isToolbarVisible) {
                     setToolbarVisible(false);
                     setAutoToggleEnabled(false);
+                    setManualToggleOnly(true); // chỉ mở lại bằng chuột phải
                 } else {
                     setToolbarVisible(true);
                     setAutoToggleEnabled(true);
+                    setManualToggleOnly(false); // cho phép auto-toggle lại
                 }
             }
         };

@@ -8,6 +8,8 @@ export const routes = {
 
     createContract: "/page/create",
     contract: "/page/create/daft",
+    contractPages: "/contracts",
+    contractDetail: "/contract-detail/:id",
 };
 
 // Routes cho Admin

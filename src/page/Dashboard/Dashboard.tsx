@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Dashboard.module.scss";
@@ -8,12 +10,30 @@ import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import Overview from "./components/overview/Overview";
 import ChartOverview from "./components/chart/ChartOverview";
 import ActivityStaff from "./components/activity/ActivityStaff";
+import { routes } from "~/config/routes.config";
 
 const cx = classNames.bind(styles);
 
 const Dashboard = () => {
     const [showAll, setShowAll] = useState(false);
-    const overviews = Array.from({ length: 5 });
+    // Sample contracts data
+    const contracts = Array.from({ length: 5 }, (_, index) => ({
+        id: `HD00${index + 1}`,
+        title: `Hợp đồng ${
+            index === 0
+                ? "giao dịch thương mại"
+                : index === 1
+                ? "cung cấp dịch vụ"
+                : index === 2
+                ? "thuê mặt bằng"
+                : index === 3
+                ? "hợp tác kinh doanh"
+                : "tư vấn pháp lý"
+        }`,
+        client: `Công ty ${String.fromCharCode(65 + index)}BC`,
+        status: index === 0 ? "active" : index === 1 ? "completed" : index === 2 ? "pending" : index === 3 ? "active" : "expired",
+        progress: Math.floor(Math.random() * 100),
+    }));
 
     return (
         <div className={cx("wrapper")}>
@@ -37,15 +57,15 @@ const Dashboard = () => {
 
                 <div className={cx("overview-title")}>
                     <h3>Hợp đồng mới nhất</h3>
-                    <Link to={"/contract"}>
+                    <Link to={routes.contractPages}>
                         <FontAwesomeIcon icon={faChevronRight} /> Truy cập
                     </Link>
                 </div>
 
                 <div className={cx("overview-fade-wrapper")}>
                     <div className={cx("overview-group", { faded: !showAll })}>
-                        {overviews.slice(0, showAll ? overviews.length : 3).map((_, index) => (
-                            <Overview key={index} />
+                        {contracts.slice(0, showAll ? contracts.length : 3).map((contract, index) => (
+                            <Overview key={contract.id} />
                         ))}
                     </div>
 
