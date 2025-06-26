@@ -1,5 +1,4 @@
 import type React from "react";
-
 import { useState, useRef, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarAlt, faChevronDown, faChevronLeft, faChevronRight, faTimes } from "@fortawesome/free-solid-svg-icons";
@@ -8,21 +7,28 @@ import classNames from "classnames/bind";
 
 const cx = classNames.bind(styles);
 
-interface DateRange {
+export interface DateRange {
     startDate: Date | null;
     endDate: Date | null;
 }
 
 interface DateRangePickerProps {
-    value: DateRange;
+    value?: DateRange;
     onChange: (range: DateRange) => void;
     placeholder?: string;
+    disabled?: boolean;
 }
 
-const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, placeholder = "Chọn khoảng thời gian" }) => {
+const DateRangePicker: React.FC<DateRangePickerProps> = ({
+    value = { startDate: null, endDate: null },
+    onChange,
+    placeholder = "Chọn khoảng thời gian",
+    disabled = false,
+}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectingStart, setSelectingStart] = useState(true);
+
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const months = [
@@ -48,16 +54,19 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
                 setIsOpen(false);
             }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const formatDate = (date: Date) => {
-        return `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date
-            .getFullYear()
-            .toString()
-            .slice(-2)}`;
+    const formatDate = (date: Date | null) => {
+        if (!date || !(date instanceof Date) || isNaN(date.getTime())) return "";
+        const vnDate = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+
+        const day = vnDate.getDate().toString().padStart(2, "0");
+        const month = (vnDate.getMonth() + 1).toString().padStart(2, "0");
+        const year = vnDate.getFullYear();
+
+        return `${day}/${month}/${year}`;
     };
 
     const getDisplayText = () => {
@@ -76,16 +85,14 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const daysInMonth = lastDay.getDate();
-        const startingDayOfWeek = firstDay.getDay(); // Keep Sunday=0 to match the image
+        const startingDayOfWeek = firstDay.getDay();
 
-        const days = [];
+        const days: (Date | null)[] = [];
 
-        // Add empty cells for days before the first day of the month
         for (let i = 0; i < startingDayOfWeek; i++) {
             days.push(null);
         }
 
-        // Add days of the month
         for (let day = 1; day <= daysInMonth; day++) {
             days.push(new Date(year, month, day));
         }
@@ -99,17 +106,16 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
     };
 
     const isDateSelected = (date: Date) => {
-        if (!value.startDate && !value.endDate) return false;
-        if (value.startDate && date.getTime() === value.startDate.getTime()) return true;
-        if (value.endDate && date.getTime() === value.endDate.getTime()) return true;
-        return false;
+        return (
+            (value.startDate && date.getTime() === value.startDate.getTime()) ||
+            (value.endDate && date.getTime() === value.endDate.getTime())
+        );
     };
 
     const handleDateClick = (date: Date) => {
-        // Don't allow selecting past dates
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        if (date < today) return;
+        if (date < today || disabled) return;
 
         if (selectingStart || !value.startDate) {
             onChange({ startDate: date, endDate: null });
@@ -140,11 +146,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
     const navigateMonth = (direction: "prev" | "next") => {
         setCurrentMonth((prev) => {
             const newDate = new Date(prev);
-            if (direction === "prev") {
-                newDate.setMonth(prev.getMonth() - 1);
-            } else {
-                newDate.setMonth(prev.getMonth() + 1);
-            }
+            newDate.setMonth(prev.getMonth() + (direction === "next" ? 1 : -1));
             return newDate;
         });
     };
@@ -153,11 +155,11 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
 
     return (
         <div className={cx("date-range-picker")} ref={dropdownRef}>
-            <div className={cx("date-input")} onClick={() => setIsOpen(!isOpen)}>
+            <div className={cx("date-input", { disabled })} onClick={() => !disabled && setIsOpen(!isOpen)}>
                 <FontAwesomeIcon icon={faCalendarAlt} className={cx("calendar-icon")} />
                 <span className={cx("date-text", { placeholder: !value.startDate && !value.endDate })}>{getDisplayText()}</span>
                 {(value.startDate || value.endDate) && (
-                    <button className={cx("clear-button")} onClick={handleClear}>
+                    <button type="button" className={cx("clear-button")} onClick={handleClear}>
                         <FontAwesomeIcon icon={faTimes} />
                     </button>
                 )}
@@ -167,13 +169,13 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
             {isOpen && (
                 <div className={cx("calendar-dropdown")}>
                     <div className={cx("calendar-header")}>
-                        <button className={cx("nav-button")} onClick={() => navigateMonth("prev")}>
+                        <button type="button" className={cx("nav-button")} onClick={() => navigateMonth("prev")}>
                             <FontAwesomeIcon icon={faChevronLeft} />
                         </button>
                         <h3 className={cx("month-year")}>
                             {months[currentMonth.getMonth()]} {currentMonth.getFullYear()}
                         </h3>
-                        <button className={cx("nav-button")} onClick={() => navigateMonth("next")}>
+                        <button type="button" className={cx("nav-button")} onClick={() => navigateMonth("next")}>
                             <FontAwesomeIcon icon={faChevronRight} />
                         </button>
                     </div>
@@ -192,6 +194,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ value, onChange, plac
                                 <div key={index} className={cx("day-cell")}>
                                     {date && (
                                         <button
+                                            type="button"
                                             className={cx("day", {
                                                 selected: isDateSelected(date),
                                                 "in-range": isDateInRange(date),

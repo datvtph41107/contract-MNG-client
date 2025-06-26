@@ -13,9 +13,9 @@ interface FormProps<T extends FieldValues> {
 const Form = <T extends FieldValues>({ defaultValues, onSubmit, onError, children, className }: FormProps<T>) => {
     const methods = useForm<T>({
         defaultValues,
-        shouldFocusError: true,
         mode: "onSubmit",
-        reValidateMode: "onChange",
+        reValidateMode: "onSubmit",
+        shouldFocusError: false,
     });
 
     return (

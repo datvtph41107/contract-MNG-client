@@ -15,15 +15,16 @@ interface Option {
     icon?: string;
 }
 
-interface SidebarDropdownProps {
+interface DropdownProps {
     options: Option[];
     value: string;
     onChange: (value: string) => void;
     placeholder?: string;
     disabled?: boolean;
+    error?: boolean;
 }
 
-const SidebarDropdown: React.FC<SidebarDropdownProps> = ({ options, value, onChange, placeholder = "Chọn...", disabled = false }) => {
+const Dropdown: React.FC<DropdownProps> = ({ options, value, onChange, placeholder = "Chọn...", disabled = false, error = false }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -47,7 +48,7 @@ const SidebarDropdown: React.FC<SidebarDropdownProps> = ({ options, value, onCha
 
     return (
         <div className={cx("dropdown", { disabled })} ref={dropdownRef}>
-            <div className={cx("dropdown-trigger", { open: isOpen })} onClick={() => !disabled && setIsOpen(!isOpen)}>
+            <div className={cx("dropdown-trigger", { open: isOpen, error: error })} onClick={() => !disabled && setIsOpen(!isOpen)}>
                 <div className={cx("selected-content")}>
                     {selectedOption?.icon && <span className={cx("icon")}>{selectedOption.icon}</span>}
                     <span className={cx("text")}>{selectedOption?.label || placeholder}</span>
@@ -74,4 +75,4 @@ const SidebarDropdown: React.FC<SidebarDropdownProps> = ({ options, value, onCha
     );
 };
 
-export default SidebarDropdown;
+export default Dropdown;

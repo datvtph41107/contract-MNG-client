@@ -22,16 +22,16 @@ export const managerOptions = [
     { value: "Hoàng Văn E - Phòng Kinh doanh", label: "Hoàng Văn E", icon: "👤" },
 ];
 
-export const generateContractCode = (): string => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const random = Math.floor(Math.random() * 1000)
-        .toString()
-        .padStart(3, "0");
-    return `HD${year}${month}${day}${random}`;
-};
+// export const generateContractCode = (): string => {
+//     const now = new Date();
+//     const year = now.getFullYear();
+//     const month = String(now.getMonth() + 1).padStart(2, "0");
+//     const day = String(now.getDate()).padStart(2, "0");
+//     const random = Math.floor(Math.random() * 1000)
+//         .toString()
+//         .padStart(3, "0");
+//     return `HD${year}${month}${day}${random}`;
+// };
 
 export const formatVietnameseDate = (date: Date): string => {
     return date.toLocaleDateString("vi-VN");
@@ -48,4 +48,24 @@ export const getContractTypeDescription = (contractType: string): string => {
         nda: "Quản lý thông tin bảo mật, các bên liên quan, thời hạn và phạm vi bảo mật",
     };
     return descriptions[contractType as keyof typeof descriptions] || "";
+};
+
+const contractTypePrefixMap: Record<string, string> = {
+    employment: "EM",
+    service: "SV",
+    partnership: "PT",
+    rental: "RT",
+    consulting: "CS",
+    training: "TR",
+    nda: "NDA",
+};
+
+let serialCounter = 0;
+
+export const generateContractCode = (contractType: string, date = new Date(), serial?: number): string => {
+    const prefix = contractTypePrefixMap[contractType] || "CT";
+    const yyyymmdd = date.toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
+    const serialNumber = (serial ?? ++serialCounter).toString().padStart(3, "0");
+
+    return `${prefix}-${yyyymmdd}-${serialNumber}`;
 };

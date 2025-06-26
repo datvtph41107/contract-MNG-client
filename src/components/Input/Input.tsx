@@ -55,6 +55,8 @@ const Input: React.FC<InputProps> = ({
                 type={type}
                 placeholder={placeholder}
                 disabled={disabled}
+                readOnly={disabled}
+                tabIndex={disabled ? -1 : undefined}
                 {...register(name, {
                     required,
                     minLength,

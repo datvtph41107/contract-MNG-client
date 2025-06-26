@@ -12,13 +12,17 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem;
+    padding: 8px 12px;
     border: 1px solid var(--gray-2);
-    border-radius: 6px;
+    border-radius: 4px;
     background: white;
     cursor: pointer;
     transition: all 0.2s ease;
-    min-height: 48px;
+    min-height: 40px;
+
+    &.error {
+        border-color: #ff4742;
+    }
 
     &:hover {
         border-color: var(--text-active);
@@ -40,7 +44,7 @@
         }
 
         .text {
-            color: var(--text-black);
+            color: var(--text-main);
             font-size: 14px;
             font-weight: 500;
         }

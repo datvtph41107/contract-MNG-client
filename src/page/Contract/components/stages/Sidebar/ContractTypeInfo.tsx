@@ -1,7 +1,7 @@
 import { CONTRACT_TYPES } from "~/constants/contract.constant";
 import { getContractTypeDescription } from "~/utils/contract.utils";
 import classNames from "classnames/bind";
-import styles from "../BasicContractForm.module.scss";
+import styles from "./Sidebar.module.scss";
 
 const cx = classNames.bind(styles);
 

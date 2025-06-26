@@ -1,179 +1,47 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import type { ContractFormData, ContractState } from "~/types/contract.types";
 
-export interface ContractParty {
-    name: string;
-    taxCode: string;
-    representative: string;
-    position: string;
-    address: string;
-    phone: string;
-    email: string;
-}
-
-export interface Milestone {
-    id: number;
-    title: string;
-    description: string;
-    type: string;
-    dueDate: Date | string;
-    status: string;
-    priority: string;
-    assignee: string;
-    tasks: Task[];
-}
-
-export interface Task {
-    id: number;
-    title: string;
-    description: string;
-    assignee: string;
-    dueDate: Date | string;
-    status: string;
-    priority: string;
-    estimatedHours?: number;
-}
-
-export interface AttachedFile {
-    id: number;
-    name: string;
-    size: string;
-    type: string;
-}
-
-interface ContractData {
-    // Stage 1: Draft
-    contractCode: string;
-    contractName: string;
-    contractType: string;
-    manager: string;
-    projectDescription: string;
-    contractValue: string;
-    startDate: Date | null;
-    endDate: Date | null;
-    paymentMethod: string;
-    paymentSchedule: string;
-    acceptanceConditions: string;
-    attachedFiles: AttachedFile[];
-    version: string;
-    internalNotes: string;
-
-    // Stage 2: Parties
-    partyA: ContractParty;
-    partyB: ContractParty;
-
-    // Stage 3: Milestones
-    milestones: Milestone[];
-
-    // Completion status
-    completedStages: boolean[];
-}
-
-interface ContractStore {
-    contractData: ContractData;
-    updateContractData: (data: Partial<ContractData>) => void;
-    validateStage: (stage: number) => boolean;
-    markStageComplete: (stage: number) => void;
-    resetContract: () => void;
-}
-
-const initialContractData: ContractData = {
-    contractCode: `HD-${new Date().getFullYear()}-${String(Date.now()).slice(-3)}`,
-    contractName: "",
-    contractType: "",
-    manager: "",
-    projectDescription: "",
-    contractValue: "",
-    startDate: null,
-    endDate: null,
-    paymentMethod: "Chuyển khoản",
-    paymentSchedule: "Thanh toán theo tiến độ",
-    acceptanceConditions: "",
-    attachedFiles: [],
-    version: "Draft v1.0",
-    internalNotes: "",
-    partyA: {
-        name: "",
-        taxCode: "",
-        representative: "",
-        position: "",
-        address: "",
-        phone: "",
-        email: "",
-    },
-    partyB: {
-        name: "",
-        taxCode: "",
-        representative: "",
-        position: "",
-        address: "",
-        phone: "",
-        email: "",
-    },
+const defaultState: ContractFormData = {
+    title: "",
+    contractCode: "",
+    contractType: "employment",
+    mode: "basic",
+    creationDate: new Date().toISOString(),
+    dateRange: { startDate: null, endDate: null },
+    details: { description: "" },
+    structuredData: {},
     milestones: [],
-    completedStages: [false, false, false, false],
 };
 
-export const useContractStore = create<ContractStore>()(
-    persist(
-        (set, get) => ({
-            contractData: initialContractData,
+export const useContractStore = create<ContractState>((set, get) => ({
+    formData: defaultState,
+    currentStep: 1,
+    completedSteps: [],
 
-            updateContractData: (data) => {
-                set((state) => ({
-                    contractData: { ...state.contractData, ...data },
-                }));
-            },
+    updateFormData: (data) => set((state) => ({ formData: { ...state.formData, ...data } })),
 
-            validateStage: (stage: number) => {
-                const { contractData } = get();
+    resetFormData: () => set({ formData: defaultState, currentStep: 1, completedSteps: [] }),
 
-                switch (stage) {
-                    case 1:
-                        return true;
-                        return !!(
-                            contractData.contractName &&
-                            contractData.contractType &&
-                            contractData.manager &&
-                            contractData.projectDescription
-                        );
-                    case 2:
-                        return true;
-                        return !!(
-                            contractData.partyA.name &&
-                            contractData.partyA.representative &&
-                            contractData.partyB.name &&
-                            contractData.partyB.representative
-                        );
-                    case 3:
-                        return true;
-                        return contractData.milestones.length > 0;
-                    case 4:
-                        return true; // Preview is always accessible if previous stages are complete
-                    default:
-                        return false;
-                }
-            },
+    goToStep: (step) => set({ currentStep: step }),
 
-            markStageComplete: (stage: number) => {
-                set((state) => {
-                    const newCompletedStages = [...state.contractData.completedStages];
-                    newCompletedStages[stage - 1] = true;
-                    return {
-                        contractData: {
-                            ...state.contractData,
-                            completedStages: newCompletedStages,
-                        },
-                    };
-                });
-            },
+    markStepComplete: (step) =>
+        set((state) => ({
+            completedSteps: Array.from(new Set([...state.completedSteps, step])),
+        })),
 
-            resetContract: () => {
-                set({ contractData: initialContractData });
-            },
-        }),
-        {
-            name: "contract-storage",
-        },
-    ),
-);
+    validateStep: (step) => {
+        const { formData } = get();
+        switch (step) {
+            case 1:
+                return true;
+                return Boolean(formData.title && formData.contractType && formData.details.description);
+            case 2:
+                return true;
+            // return formData.milestones.length > 0;
+            case 3:
+                return true;
+            default:
+                return false;
+        }
+    },
+}));

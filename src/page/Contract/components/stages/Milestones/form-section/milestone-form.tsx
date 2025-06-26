@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarAlt, faPlus, faCheck } from "@fortawesome/free-solid-svg-icons";
@@ -138,7 +136,7 @@ export const MilestoneForm = ({ onSubmit, onReset }: MilestoneFormProps) => {
                 </div>
 
                 <div className={cx("form-section")}>
-                    <h4>��� Thời gian & Nguồn lực</h4>
+                    <h4>⏰ Thời gian & Nguồn lực</h4>
 
                     <div className={cx("form-group")}>
                         <label>Thời hạn hoàn thành *</label>

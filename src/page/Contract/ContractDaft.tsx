@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom"; // Import react-router-dom hooks
 import ProgressBarHeader from "./components/ProgressBarHeader/ProgressBarHeader";
 import Stage1Draft from "./components/stages/StageDraft";
-import Stage2Parties from "./components/stages/StageParties";
+// import Stage2Parties from "./components/stages/StageParties";
 import Stage3Milestones from "./components/stages/Milestones/StageMilestones";
 import Stage4Preview from "./components/stages/StagePreview";
 import { useContractStore } from "~/store/contract-store";
@@ -18,7 +18,7 @@ const ContractDaft = () => {
     const params = new URLSearchParams(location.search);
     const currentStage = Number.parseInt(params.get("stage") || "1");
     const currentContractType = params.get("type") || "basic";
-    const { contractData, validateStage } = useContractStore();
+    const { validateStep } = useContractStore();
 
     const [isVisible, setIsVisible] = useState(true);
     const [isAtTop, setIsAtTop] = useState(true);
@@ -82,20 +82,20 @@ const ContractDaft = () => {
 
     useEffect(() => {
         if (currentStage < 1 || currentStage > 4) {
-            navigate(`/${routes.createContract}?stage=1`); // Use navigate from react-router-dom
+            navigate(`/${routes.createContract}?stage=1`);
         }
     }, [currentStage, navigate]);
 
     useEffect(() => {
         if (currentStage > 1) {
             for (let i = 1; i < currentStage; i++) {
-                if (!validateStage(i)) {
-                    navigate(`/${routes.createContract}?stage=${i}`); // Use navigate to redirect
+                if (!validateStep(i)) {
+                    navigate(`/${routes.createContract}?stage=${i}`);
                     return;
                 }
             }
         }
-    }, [currentStage, validateStage, navigate]);
+    }, [currentStage, validateStep, navigate]);
 
     const renderStage = () => {
         switch (currentStage) {

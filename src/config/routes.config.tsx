@@ -9,6 +9,7 @@ export const routes = {
     createContract: "/page/create",
     contract: "/page/create/daft",
     contractPages: "/contracts",
+    contractTypes: "/contracts/type",
     contractDetail: "/contract-detail/:id",
 };
 

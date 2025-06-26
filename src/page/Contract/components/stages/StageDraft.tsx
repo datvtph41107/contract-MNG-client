@@ -26,22 +26,10 @@ interface Stage1DraftProps {
 }
 
 const StageDraft: React.FC<Stage1DraftProps> = ({ contractType }) => {
-    const navigate = useNavigate();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const currentContractType = contractType || params.get("type") || "basic";
-
-    const { validateStage, markStageComplete } = useContractStore();
     const { isFullscreen, sidebarCollapsed, toggleSidebar } = useContractEditorStore();
-
-    const handleNext = () => {
-        if (validateStage(1)) {
-            markStageComplete(1);
-            navigate(`/${routes.contract}?stage=2&type=${currentContractType}`);
-        } else {
-            alert("Vui lòng điền đầy đủ thông tin bắt buộc!");
-        }
-    };
 
     // Auto collapse sidebar on mobile
     useEffect(() => {
@@ -111,15 +99,6 @@ const StageDraft: React.FC<Stage1DraftProps> = ({ contractType }) => {
     return (
         <div className={cx("stage1-container", { fullscreen: isFullscreen })}>
             {renderStageContent()}
-
-            {!isFullscreen && (
-                <div style={{ color: "red" }} className={cx("stage-navigation")}>
-                    <button onClick={handleNext} className={cx("next-btn", { disabled: !validateStage(1) })} disabled={!validateStage(1)}>
-                        <span>Tiếp tục đến giai đoạn 2</span>
-                        <FontAwesomeIcon icon={faArrowRight} />
-                    </button>
-                </div>
-            )}
 
             {/* Toggle sidebar (only for editor mode) */}
             {currentContractType === "editor" && (

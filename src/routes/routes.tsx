@@ -11,6 +11,7 @@ import Dashboard from "~/page/Dashboard";
 import ContractDaft from "~/page/Contract/ContractDaft";
 import ContractDetail from "~/page/Contract/ContractDetail";
 import CreateContract from "~/page/Contract/CreateContract";
+import ContractTypeManager from "~/page/Contract/ContractTypeManager";
 
 // Public routes
 const publicRoutes = [
@@ -23,6 +24,7 @@ const publicRoutes = [
     { path: config.routes.contract, component: ContractDaft, layout: CreateContractLayout },
     { path: config.routes.contractPages, component: ContractPage, layout: DefaultLayout },
     { path: config.routes.contractDetail, component: ContractDetail, layout: DefaultLayout },
+    { path: config.routes.contractTypes, component: ContractTypeManager, layout: DefaultLayout },
 
     // Admin
     { path: config.routes.adminLogin, component: AdminLogin },

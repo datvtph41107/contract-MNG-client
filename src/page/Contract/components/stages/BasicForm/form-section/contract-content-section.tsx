@@ -1,21 +1,18 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileContract, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
+import { faFileContract } from "@fortawesome/free-solid-svg-icons";
 import TextArea from "~/components/TextArea";
-import DateRangePicker from "~/components/DateRangePicker/DateRangePicker";
-import { ContractContentRenderer } from "../contract-content/contract-content-renderer";
-import type { DateRange } from "~/types/contract.types";
 import classNames from "classnames/bind";
 import styles from "../BasicContractForm.module.scss";
+import ControlledDateRangeField from "~/components/Form/ControllerValid/ControllerDatePicker";
+import ControlledFileUploadField from "~/components/Form/ControllerValid/ControlledFileUploadField";
+import { ContractContentRenderer } from "../contract-content/contract-content-renderer";
 
 const cx = classNames.bind(styles);
-
-interface ContractContentSectionProps {
-    contractType: string;
-    dateRange: DateRange;
-    onDateRangeChange: (range: DateRange) => void;
+interface ContractTypeInfoProps {
+    selectedType: string;
 }
 
-export const ContractContentSection = ({ contractType, dateRange, onDateRangeChange }: ContractContentSectionProps) => {
+export const ContractContentSection = ({ selectedType }: ContractTypeInfoProps) => {
     return (
         <div className={cx("section-card")}>
             <h3>
@@ -23,13 +20,15 @@ export const ContractContentSection = ({ contractType, dateRange, onDateRangeCha
                 3. Nội dung hợp đồng
             </h3>
 
-            <div className={cx("form-group", "full-width")}>
-                <label className={cx("form-label")}>
-                    <FontAwesomeIcon icon={faCalendarAlt} />
-                    Thời gian hiệu lực *
-                </label>
-                <DateRangePicker value={dateRange} onChange={onDateRangeChange} placeholder="Chọn thời gian bắt đầu và kết thúc" />
-            </div>
+            <ControlledDateRangeField
+                name="dateRange"
+                label="Thời gian hiệu lực"
+                requiredMessage="Bạn chưa chọn đủ thời gian"
+                placeholder="Chọn ngày bắt đầu và kết thúc"
+                // onExternalChange={(value) => {
+                //     console.log("Date range selected:", value);
+                // }}
+            />
 
             <TextArea
                 name="description"
@@ -39,7 +38,14 @@ export const ContractContentSection = ({ contractType, dateRange, onDateRangeCha
                 rows={3}
             />
 
-            {/* <ContractContentRenderer contractType={contractType} /> */}
+            <ControlledFileUploadField
+                name="attachedFiles"
+                label="Tài liệu đính kèm (nếu có)"
+                maxFiles={5}
+                acceptedTypes={[".pdf", ".docx", ".xlsx", ".jpg", ".png"]}
+            />
+
+            {/* <ContractContentRenderer contractType={selectedType} /> */}
         </div>
     );
 };
