@@ -17,7 +17,7 @@ export const GeneralInfoSection = () => {
             </h3>
             <div className={cx("form-grid")}>
                 <Input
-                    name="title"
+                    name="name"
                     label="Tên hợp đồng *"
                     placeholder="VD: Hợp đồng cung cấp dịch vụ kế toán quý 3/2025"
                     required="Vui lòng nhập tên hợp đồng"

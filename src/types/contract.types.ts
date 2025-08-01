@@ -2,55 +2,131 @@ export type ContractMode = "basic" | "editor" | "upload";
 export type ContractType = "employment" | "service" | "partnership" | "rental" | "consulting" | "training" | "nda";
 
 export interface DateRange {
-    startDate: Date | null;
-    endDate: Date | null;
+    startDate: string | null;
+    endDate: string | null;
+}
+
+export interface TimeRange {
+    startDate: string | null;
+    endDate: string | null;
+    estimatedHours: number;
+}
+
+export interface Task {
+    id: string;
+    name: string;
+    description: string;
+    assignee: string;
+    timeRange: TimeRange;
+    completed?: boolean;
 }
 
 export interface Milestone {
     id: string;
-    title: string;
+    name: string;
     description: string;
-    dueDate: Date;
-    tasks: string[];
+    dateRange: DateRange;
+    priority: "low" | "medium" | "high" | "critical";
+    assignee: string;
+    tasks: Task[];
+}
+
+export interface NotificationSettings {
+    contractNotifications: string[];
+    milestoneNotifications: string[];
+    taskNotifications: string[];
+    globalSettings: {
+        enableEmailNotifications: boolean;
+        enableSMSNotifications: boolean;
+        enableInAppNotifications: boolean;
+        enablePushNotifications: boolean;
+        defaultRecipients: string[];
+        workingHours: {
+            start: string;
+            end: string;
+            timezone: string;
+        };
+    };
 }
 
 export interface ContractFormData {
-    id?: string;
     contractCode: string;
-    title: string;
     contractType: ContractType;
-    mode: ContractMode;
-    creationDate: string;
     dateRange: DateRange;
     details: {
+        description: string;
         department?: string;
         vendorName?: string;
         contractValue?: number;
-        description: string;
     };
-    structuredData?: unknown; // varies per contractType
+    drafter: string;
+    manager: string;
     milestones: Milestone[];
+    mode: ContractMode;
+    name: string;
+    notificationSettings: NotificationSettings;
+    structuredData: Record<string, any>;
+}
+
+export interface MilestoneFormData {
+    name: string;
+    description: string;
+    dateRange: DateRange;
+    priority: "low" | "medium" | "high" | "critical";
+    assignee: string;
+    tasks: TaskFormData[];
+}
+
+export interface TaskFormData {
+    id?: string;
+    name: string;
+    description: string;
+    assignee: string;
+    timeRange: TimeRange;
+}
+
+export interface StepNavigationResult {
+    success: boolean;
+    step: number;
+    message?: string;
+    error?: string;
+}
+
+export interface FormProgress {
+    completed: number;
+    total: number;
+    percentage: number;
+    current: number;
 }
 
 export interface ContractState {
+    // Data
     formData: ContractFormData;
     currentStep: number;
     completedSteps: number[];
+    isFormDirty: boolean;
+    lastSavedAt: string | null;
 
+    // Basic actions
     updateFormData: (data: Partial<ContractFormData>) => void;
     resetFormData: () => void;
 
+    // Step navigation
     goToStep: (step: number) => void;
-    validateStep: (step: number) => boolean;
     markStepComplete: (step: number) => void;
-}
+    nextStep: () => StepNavigationResult;
+    prevStep: () => StepNavigationResult;
 
-export interface FileAttachment {
-    id: string;
-    file: File;
-    name: string;
-    size: number;
-    type: string;
-    url: string;
-    uploadedAt: Date;
+    // Validation
+    validateStep: (step: number) => boolean;
+
+    // Specific data setters
+    setStep1Data: (data: Partial<ContractFormData>) => void;
+    setMilestones: (milestones: Milestone[]) => void;
+
+    // Utility methods
+    canAccessStep: (step: number) => boolean;
+    getStepProgress: () => FormProgress;
+    markFormClean: () => void;
+    hasUnsavedChanges: () => boolean;
 }

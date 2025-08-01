@@ -1,60 +1,80 @@
+"use client";
+
+import { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileContract } from "@fortawesome/free-solid-svg-icons";
 import Form from "~/components/Form/Form";
 import { ContractManagementSection } from "./form-section/contract-management-section";
 import { GeneralInfoSection } from "./form-section/general-info-section";
 import { ContractContentSection } from "./form-section/contract-content-section";
-import { ProgressSidebar } from "../Sidebar/ProgressSidebar";
-import { ContractTypeInfo } from "../Sidebar/ContractTypeInfo";
+import { ProgressSidebar } from "../../Sidebar/ProgressSidebar";
+import { ContractTypeInfo } from "../../Sidebar/ContractTypeInfo";
 import { useContractForm } from "~/hooks/useContractForm";
-import type { ContractFormData, FileAttachment } from "~/types/contract.types";
+import type { ContractFormData } from "~/types/contract.types";
 import styles from "./BasicContractForm.module.scss";
 import classNames from "classnames/bind";
-import { useState } from "react";
 import type { FieldErrors } from "react-hook-form";
+import { convertDateRange } from "~/utils/contract";
 
 const cx = classNames.bind(styles);
 
 const BasicContractForm = () => {
     const { formData, setStep1Data, nextStep, validateStep, currentStep } = useContractForm();
-    const [attachedFiles, setAttachedFiles] = useState<FileAttachment[]>([]);
 
-    // Tạo defaultValues từ formData trong store
+    // Ensure we're on step 1
+    useEffect(() => {
+        console.log("BasicContractForm mounted, current formData:", formData);
+    }, [formData]);
+
+    // Create defaultValues from current formData
     const defaultValues: Partial<ContractFormData> = {
-        title: formData.title,
-        contractType: formData.contractType,
-        creationDate: formData.creationDate,
-        dateRange: formData.dateRange,
-        details: formData.details,
-        milestones: formData.milestones,
+        name: formData.name || "",
+        contractCode: formData.contractCode || "",
+        contractType: formData.contractType || "employment",
+        drafter: formData.drafter || "",
+        manager: formData.manager || "",
+        mode: formData.mode || "basic",
+        dateRange: formData.dateRange || { startDate: null, endDate: null },
+        details: formData.details || { description: "" },
+        structuredData: formData.structuredData || {},
+        milestones: formData.milestones || [],
+        notificationSettings: formData.notificationSettings || {
+            contractNotifications: [],
+            milestoneNotifications: [],
+            taskNotifications: [],
+            globalSettings: {
+                enableEmailNotifications: true,
+                enableSMSNotifications: false,
+                enableInAppNotifications: true,
+                enablePushNotifications: true,
+                defaultRecipients: [],
+                workingHours: {
+                    start: "09:00",
+                    end: "17:00",
+                    timezone: "Asia/Ho_Chi_Minh",
+                },
+            },
+        },
     };
 
     const handleFormSubmit = (data: ContractFormData) => {
         console.log("Form submitted with data:", data);
 
-        // Lưu dữ liệu vào store
-        const formDataWithFiles = {
+        // Process date range if needed
+        const processedData: ContractFormData = {
             ...data,
-            attachments: attachedFiles,
+            dateRange: data.dateRange ? convertDateRange(data.dateRange) : { startDate: null, endDate: null },
         };
 
-        // Cập nhật dữ liệu step 1
-        setStep1Data(formDataWithFiles);
+        // Save data to store
+        setStep1Data(processedData);
 
-        // Validate và chuyển sang step 2
-        if (validateStep(1)) {
-            console.log("Step 1 validation passed, moving to step 2");
-            nextStep();
-        } else {
-            console.log("valid");
-
-            // alert("Thông tin chưa hợp lệ, vui lòng kiểm tra lại các trường bắt buộc.");
-        }
+        // Move to next step
+        nextStep();
     };
 
     const handleError = (errors: FieldErrors) => {
         console.log("Form validation errors:", errors);
-        // alert("Vui lòng kiểm tra lại thông tin đã nhập.");
     };
 
     return (
@@ -66,21 +86,18 @@ const BasicContractForm = () => {
                 </h2>
                 <p>Điền thông tin cơ bản của hợp đồng để bắt đầu quá trình quản lý</p>
             </div>
-
             <div className={cx("form-content")}>
                 <div className={cx("form-section")}>
                     <Form<ContractFormData>
+                        key={`step1-${JSON.stringify(defaultValues)}`}
                         className={cx("form-section")}
                         defaultValues={defaultValues}
                         onSubmit={handleFormSubmit}
                         onError={handleError}
                     >
                         <ContractManagementSection />
-
                         <GeneralInfoSection />
-
                         <ContractContentSection selectedType={formData.contractType} />
-
                         <div className={cx("form-actions")}>
                             <button type="submit" className={cx("submit-button")}>
                                 <FontAwesomeIcon icon={faFileContract} />
@@ -89,7 +106,6 @@ const BasicContractForm = () => {
                         </div>
                     </Form>
                 </div>
-
                 <div className={cx("form-sidebar")}>
                     <ProgressSidebar />
                     <ContractTypeInfo selectedType={formData.contractType} />

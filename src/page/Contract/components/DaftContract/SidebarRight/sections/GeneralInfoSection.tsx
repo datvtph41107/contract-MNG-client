@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile, faChevronUp, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import SidebarDropdown from "../../../Dropdown/Dropdown";
 import AutoResizeText from "../AutoResizeText/AutoResizeText";
-import { contractTypeOptions, managerOptions, formatDate } from "~/utils/contract.utils";
+import { contractTypeOptions, managerOptions, formatDate } from "~/utils/contract";
 
 const cx = classNames.bind(styles);
 

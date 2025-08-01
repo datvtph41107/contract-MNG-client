@@ -1,7 +1,4 @@
-"use client";
-
-import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode, type FC } from "react";
 import classNames from "classnames/bind";
 import styles from "./DefaultLayout.module.scss";
 import Sidebar from "../components/Sidebar";
@@ -9,7 +6,7 @@ import { useLocation } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
-const DefaultLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const DefaultLayout: FC<{ children: ReactNode }> = ({ children }) => {
     const [collapsed, setCollapsed] = useState(false);
     const [showChildren, setShowChildren] = useState(true);
     const location = useLocation();

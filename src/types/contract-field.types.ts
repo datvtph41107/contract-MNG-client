@@ -2,7 +2,7 @@ export interface ContractField {
     id: string;
     name: string;
     label: string;
-    type: "text" | "textarea" | "number" | "date" | "select" | "checkbox" | "radio" | "file";
+    type: FieldType;
     required: boolean;
     placeholder?: string;
     description?: string;
@@ -16,8 +16,17 @@ export interface ContractField {
         value: string;
         label: string;
     }>;
-    defaultValue?: any;
+    defaultValue?: unknown;
     order: number;
+}
+
+export type FieldType = "text" | "number" | "date" | "textarea" | "select" | "checkbox" | "radio";
+
+export interface DynamicField {
+    id: string;
+    label: string;
+    placeholder: string;
+    type: FieldType;
 }
 
 export interface CustomContractType {

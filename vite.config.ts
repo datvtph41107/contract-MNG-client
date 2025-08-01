@@ -7,10 +7,18 @@ export default defineConfig({
     plugins: [react()],
     resolve: {
         alias: {
-            "~": path.resolve(__dirname, "src"), // Define the alias
+            "~": path.resolve(__dirname, "./src"),
         },
     },
-    css: {
-        devSourcemap: false, // Disable source maps in development
+    server: {
+        port: 5173,
+        host: true,
+        hmr: {
+            port: 5173,
+        },
+    },
+    build: {
+        outDir: "dist",
+        sourcemap: true,
     },
 });

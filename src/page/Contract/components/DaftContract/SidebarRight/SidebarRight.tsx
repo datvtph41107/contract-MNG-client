@@ -4,7 +4,7 @@ import classNames from "classnames/bind";
 import styles from "./SidebarRight.module.scss";
 import { useContractForm } from "~/hooks/useContractForm";
 import { useModalManager } from "~/hooks/useModalManager";
-import DatePicker from "../../DatePicker/DatePicker";
+import DatePicker from "../../../../../components/DateRangePicker/DatePicker/DatePicker";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faProjectDiagram, faBell, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 

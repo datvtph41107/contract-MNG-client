@@ -3,7 +3,7 @@ import { faCode } from "@fortawesome/free-solid-svg-icons";
 import Input from "~/components/Input";
 import classNames from "classnames/bind";
 import styles from "../BasicContractForm.module.scss";
-import { generateContractCode } from "~/utils/contract.utils";
+import { generateContractCode } from "~/utils/contract";
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 

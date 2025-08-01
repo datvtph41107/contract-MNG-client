@@ -12,14 +12,39 @@ export interface DateRange {
     endDate: Date | null;
 }
 
-interface DateRangePickerProps {
+interface Props {
     value?: DateRange;
     onChange: (range: DateRange) => void;
     placeholder?: string;
     disabled?: boolean;
 }
 
-const DateRangePicker: React.FC<DateRangePickerProps> = ({
+const parseDate = (d: Date | string | null | undefined): Date | null => {
+    if (!d) return null;
+    const date = d instanceof Date ? d : new Date(d);
+    return isNaN(date.getTime()) ? null : date;
+};
+
+const normalizeDate = (d: Date | string | null | undefined): Date | null => {
+    const date = parseDate(d);
+    return date ? new Date(date.getFullYear(), date.getMonth(), date.getDate()) : null;
+};
+
+const isSameDay = (a: Date | string | null, b: Date | string | null): boolean => {
+    const da = normalizeDate(a),
+        db = normalizeDate(b);
+    return !!(da && db && da.getTime() === db.getTime());
+};
+
+const formatDate = (input: Date | string | null): string => {
+    const date = parseDate(input);
+    if (!date) return "";
+    const str = date.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" });
+    const vn = new Date(str);
+    return `${String(vn.getDate()).padStart(2, "0")}/${String(vn.getMonth() + 1).padStart(2, "0")}/${vn.getFullYear()}`;
+};
+
+const DateRangePicker: React.FC<Props> = ({
     value = { startDate: null, endDate: null },
     onChange,
     placeholder = "Chọn khoảng thời gian",
@@ -28,113 +53,58 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
     const [isOpen, setIsOpen] = useState(false);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectingStart, setSelectingStart] = useState(true);
-
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const months = [
-        "Tháng 1",
-        "Tháng 2",
-        "Tháng 3",
-        "Tháng 4",
-        "Tháng 5",
-        "Tháng 6",
-        "Tháng 7",
-        "Tháng 8",
-        "Tháng 9",
-        "Tháng 10",
-        "Tháng 11",
-        "Tháng 12",
-    ];
-
-    const weekDays = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+    const today = normalizeDate(new Date())!;
 
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
+        const handleClickOutside = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setIsOpen(false);
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const formatDate = (date: Date | null) => {
-        if (!date || !(date instanceof Date) || isNaN(date.getTime())) return "";
-        const vnDate = new Date(date.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
-
-        const day = vnDate.getDate().toString().padStart(2, "0");
-        const month = (vnDate.getMonth() + 1).toString().padStart(2, "0");
-        const year = vnDate.getFullYear();
-
-        return `${day}/${month}/${year}`;
-    };
-
-    const getDisplayText = () => {
-        if (value.startDate && value.endDate) {
-            return `${formatDate(value.startDate)} - ${formatDate(value.endDate)}`;
-        }
-        if (value.startDate) {
-            return formatDate(value.startDate);
-        }
-        return placeholder;
-    };
-
     const getDaysInMonth = (date: Date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const daysInMonth = lastDay.getDate();
-        const startingDayOfWeek = firstDay.getDay();
-
-        const days: (Date | null)[] = [];
-
-        for (let i = 0; i < startingDayOfWeek; i++) {
-            days.push(null);
-        }
-
-        for (let day = 1; day <= daysInMonth; day++) {
-            days.push(new Date(year, month, day));
-        }
-
+        const year = date.getFullYear(),
+            month = date.getMonth();
+        const start = new Date(year, month, 1).getDay();
+        const total = new Date(year, month + 1, 0).getDate();
+        const days = Array(start)
+            .fill(null)
+            .concat([...Array(total)].map((_, i) => new Date(year, month, i + 1)));
         return days;
     };
 
     const isDateInRange = (date: Date) => {
-        if (!value.startDate || !value.endDate) return false;
-        return date >= value.startDate && date <= value.endDate;
+        const d = normalizeDate(date);
+        const start = normalizeDate(value.startDate);
+        const end = normalizeDate(value.endDate);
+        return !!(d && start && end && d >= start && d <= end);
     };
 
-    const isDateSelected = (date: Date) => {
-        return (
-            (value.startDate && date.getTime() === value.startDate.getTime()) ||
-            (value.endDate && date.getTime() === value.endDate.getTime())
-        );
-    };
+    const isDateDisabled = (date: Date) => normalizeDate(date)! < today;
 
     const handleDateClick = (date: Date) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (date < today || disabled) return;
+        if (disabled || isDateDisabled(date)) return;
+        const base = parseDate(date)!;
+        const selected = new Date(base);
+        selected.setHours(selectingStart ? 8 : 17, 0, 0, 0);
 
         if (selectingStart || !value.startDate) {
-            onChange({ startDate: date, endDate: null });
+            onChange({ startDate: selected, endDate: null });
             setSelectingStart(false);
         } else {
-            if (date < value.startDate) {
-                onChange({ startDate: date, endDate: value.startDate });
+            const startVN = parseDate(value.startDate)!;
+            startVN.setHours(8, 0, 0, 0);
+            if (selected < startVN) {
+                onChange({ startDate: selected, endDate: startVN });
             } else {
-                onChange({ startDate: value.startDate, endDate: date });
+                onChange({ startDate: startVN, endDate: selected });
             }
             setSelectingStart(true);
             setIsOpen(false);
         }
-    };
-
-    const isDateDisabled = (date: Date) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return date < today;
     };
 
     const handleClear = (e: React.MouseEvent) => {
@@ -143,13 +113,17 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         setSelectingStart(true);
     };
 
-    const navigateMonth = (direction: "prev" | "next") => {
-        setCurrentMonth((prev) => {
-            const newDate = new Date(prev);
-            newDate.setMonth(prev.getMonth() + (direction === "next" ? 1 : -1));
-            return newDate;
-        });
+    const navigateMonth = (dir: "next" | "prev") => {
+        const diff = dir === "next" ? 1 : -1;
+        setCurrentMonth((prev) => new Date(prev.getFullYear(), prev.getMonth() + diff, 1));
     };
+
+    const displayText =
+        value.startDate && value.endDate
+            ? `${formatDate(value.startDate)} - ${formatDate(value.endDate)}`
+            : value.startDate
+            ? formatDate(value.startDate)
+            : placeholder;
 
     const days = getDaysInMonth(currentMonth);
 
@@ -157,7 +131,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         <div className={cx("date-range-picker")} ref={dropdownRef}>
             <div className={cx("date-input", { disabled })} onClick={() => !disabled && setIsOpen(!isOpen)}>
                 <FontAwesomeIcon icon={faCalendarAlt} className={cx("calendar-icon")} />
-                <span className={cx("date-text", { placeholder: !value.startDate && !value.endDate })}>{getDisplayText()}</span>
+                <span className={cx("date-text", { placeholder: !value.startDate && !value.endDate })}>{displayText}</span>
                 {(value.startDate || value.endDate) && (
                     <button type="button" className={cx("clear-button")} onClick={handleClear}>
                         <FontAwesomeIcon icon={faTimes} />
@@ -169,36 +143,35 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             {isOpen && (
                 <div className={cx("calendar-dropdown")}>
                     <div className={cx("calendar-header")}>
-                        <button type="button" className={cx("nav-button")} onClick={() => navigateMonth("prev")}>
+                        <button className={cx("nav-button")} onClick={() => navigateMonth("prev")}>
                             <FontAwesomeIcon icon={faChevronLeft} />
                         </button>
                         <h3 className={cx("month-year")}>
-                            {months[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                            Tháng {currentMonth.getMonth() + 1} {currentMonth.getFullYear()}
                         </h3>
-                        <button type="button" className={cx("nav-button")} onClick={() => navigateMonth("next")}>
+                        <button className={cx("nav-button")} onClick={() => navigateMonth("next")}>
                             <FontAwesomeIcon icon={faChevronRight} />
                         </button>
                     </div>
 
                     <div className={cx("calendar-grid")}>
                         <div className={cx("weekdays")}>
-                            {weekDays.map((day) => (
-                                <div key={day} className={cx("weekday")}>
-                                    {day}
+                            {["CN", "T2", "T3", "T4", "T5", "T6", "T7"].map((d) => (
+                                <div key={d} className={cx("weekday")}>
+                                    {d}
                                 </div>
                             ))}
                         </div>
-
                         <div className={cx("days")}>
-                            {days.map((date, index) => (
-                                <div key={index} className={cx("day-cell")}>
+                            {days.map((date, i) => (
+                                <div key={i} className={cx("day-cell")}>
                                     {date && (
                                         <button
                                             type="button"
                                             className={cx("day", {
-                                                selected: isDateSelected(date),
+                                                selected: isSameDay(date, value.startDate) || isSameDay(date, value.endDate),
                                                 "in-range": isDateInRange(date),
-                                                today: date.toDateString() === new Date().toDateString(),
+                                                today: isSameDay(date, today),
                                                 disabled: isDateDisabled(date),
                                             })}
                                             onClick={() => handleDateClick(date)}

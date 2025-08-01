@@ -4,12 +4,12 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEdit, faTrash, faSave, faTimes, faFileContract, faEye, faCog, faList } from "@fortawesome/free-solid-svg-icons";
 import { useContractTypeStore } from "~/store/contract-type-store";
-import { FieldBuilder } from "./components/stages/ContentTypeRender/FieldBuilder/FieldBuilder";
-import { ContractTypePreview } from "./components/stages/ContentTypeRender/Preview/ContractTypePreview";
+import { FieldBuilder } from "./components/ContentTypeRender/FieldBuilder/FieldBuilder";
+import { ContractTypePreview } from "./components/ContentTypeRender/Preview/ContractTypePreview";
 import type { CustomContractType, ContractField } from "~/types/contract-field.types";
 import classNames from "classnames/bind";
 import styles from "./ContractTypeManager.module.scss";
-import { InteractivePreview } from "./components/stages/ContentTypeRender/Preview/InteractivePreview";
+import { InteractivePreview } from "./components/ContentTypeRender/Preview/InteractivePreview";
 // import { IconSelector } from "./IconSelector";
 
 const cx = classNames.bind(styles);

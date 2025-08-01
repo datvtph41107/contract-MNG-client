@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarAlt, faPlus, faCheck } from "@fortawesome/free-solid-svg-icons";
-import DatePicker from "../../../DatePicker/DatePicker";
+import DatePicker from "../../../../../../components/DateRangePicker/DatePicker/DatePicker";
 import Dropdown from "../../../Dropdown/Dropdown";
 import { MILESTONE_TYPES, PRIORITY_OPTIONS, EMPLOYEES } from "~/constants/milestone.constants";
 import type { MilestoneFormData } from "~/types/milestone.types";

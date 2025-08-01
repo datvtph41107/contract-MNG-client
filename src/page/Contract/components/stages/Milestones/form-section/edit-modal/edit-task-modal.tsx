@@ -3,7 +3,7 @@ import type React from "react";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
-import DatePicker from "../../../../DatePicker/DatePicker";
+import DatePicker from "../../../../../../../components/DateRangePicker/DatePicker/DatePicker";
 import Dropdown from "../../../../Dropdown/Dropdown";
 import { PRIORITY_OPTIONS, EMPLOYEES, TASK_TAGS } from "~/constants/milestone.constants";
 import type { Task, Milestone } from "~/types/milestone.types";

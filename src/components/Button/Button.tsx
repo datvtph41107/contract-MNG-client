@@ -1,18 +1,105 @@
-import type React from "react";
+import classNames from "classnames/bind";
 import styles from "./Button.module.scss";
+import { Link } from "react-router-dom";
+import type { MouseEventHandler, ReactNode } from "react";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
-    size?: "sm" | "md" | "lg";
-    children: React.ReactNode;
+const cx = classNames.bind(styles);
+
+interface ButtonProps {
+    to?: string;
+    href?: string;
+    primary?: boolean;
+    gray?: boolean;
+    outline?: boolean;
+    rounded?: boolean;
+    small?: boolean;
+    fullWidth?: boolean;
+    medium?: boolean;
+    large?: boolean;
+    text?: boolean;
+    bolder?: boolean;
+    disabled?: boolean;
+    leftIcon?: ReactNode;
+    rightIcon?: ReactNode;
+    leftIconStyles?: string;
+    className?: string;
+    children: ReactNode;
+    onClick?: MouseEventHandler<HTMLElement>;
+    type?: "button" | "submit" | "reset";
 }
 
-export default function Button({ variant = "primary", size = "md", className = "", children, ...props }: ButtonProps) {
-    const buttonClass = `${styles.button} ${styles[variant]} ${styles[size]} ${className}`;
+function Button({
+    to,
+    href,
+    primary,
+    gray,
+    outline,
+    rounded,
+    small,
+    medium,
+    large,
+    text,
+    disabled,
+    children,
+    bolder,
+    onClick,
+    leftIcon,
+    rightIcon,
+    leftIconStyles,
+    className,
+    fullWidth,
+    type = "button",
+    ...rest
+}: ButtonProps) {
+    let Comp: React.ElementType = "button";
+    const props: Record<string, unknown> = {
+        ...rest,
+    };
+
+    if (to) {
+        Comp = Link;
+        props.to = to;
+    } else if (href) {
+        Comp = "a";
+        props.href = href;
+    } else {
+        props.type = type;
+    }
+
+    if (!disabled && onClick) {
+        props.onClick = onClick;
+    }
+
+    if (disabled) {
+        // Remove all event handlers starting with "on"
+        Object.keys(props).forEach((key) => {
+            if (key.startsWith("on") && typeof props[key] === "function") {
+                delete props[key];
+            }
+        });
+    }
+
+    const classes = cx("wrapper", className, {
+        primary,
+        fullWidth,
+        gray,
+        outline,
+        text,
+        small,
+        medium,
+        large,
+        disabled,
+        bolder,
+        rounded,
+    });
 
     return (
-        <button className={buttonClass} {...props}>
-            {children}
-        </button>
+        <Comp className={classes} {...props}>
+            {leftIcon && <span className={cx("icon", "left", leftIconStyles)}>{leftIcon}</span>}
+            <span className={cx("content")}>{children}</span>
+            {rightIcon && <span className={cx("icon", "right")}>{rightIcon}</span>}
+        </Comp>
     );
 }
+
+export default Button;

@@ -1,3 +1,4 @@
+import React from "react";
 import { useFormContext } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import classNames from "classnames/bind";
@@ -13,9 +14,15 @@ interface InputProps {
     required?: string;
     minLength?: { value: number; message: string };
     pattern?: { value: RegExp; message: string };
+    min?: number | string;
+    max?: number | string;
+    step?: number | string;
     classNameInput?: string;
     classNameLabel?: string;
     disabled?: boolean;
+    value?: string | number;
+    onChange?: (value: string | number) => void;
+    error?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -26,46 +33,71 @@ const Input: React.FC<InputProps> = ({
     required,
     minLength,
     pattern,
+    min,
+    max,
+    step,
     classNameInput,
     classNameLabel,
     disabled,
+    value,
+    onChange,
+    error,
 }) => {
-    const {
-        register,
-        formState: { errors },
-    } = useFormContext();
+    const form = useFormContext();
+    const isControlled = typeof value !== "undefined" && typeof onChange === "function";
 
-    const classes = cx("form-input", classNameInput, {
-        error: errors[name],
-        disable: disabled,
-    });
+    const inputProps = isControlled
+        ? {
+              value,
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) => onChange(type === "number" ? Number(e.target.value) : e.target.value),
+          }
+        : form?.register?.(name, {
+              required,
+              minLength,
+              pattern,
+          });
 
-    const classesLabel = cx("form-label", classNameLabel);
+    const hasError = !!error || !!form?.formState?.errors?.[name];
 
     return (
         <div className={cx("form-group")}>
             {label && (
-                <label className={classesLabel} htmlFor={name}>
+                <label htmlFor={name} className={cx("form-label", classNameLabel)}>
                     {label}
                 </label>
             )}
 
             <input
                 id={name}
+                name={name}
                 type={type}
                 placeholder={placeholder}
                 disabled={disabled}
                 readOnly={disabled}
                 tabIndex={disabled ? -1 : undefined}
-                {...register(name, {
-                    required,
-                    minLength,
-                    pattern,
+                min={min}
+                max={max}
+                step={step}
+                className={cx("form-input", classNameInput, {
+                    error: hasError,
+                    disable: disabled,
                 })}
-                className={classes}
+                {...inputProps}
             />
 
-            <ErrorMessage errors={errors} name={name} render={({ message }) => <p className={cx("error-message")}>{message}</p>} />
+            {error ? (
+                <p className={cx("error-message")}>{error}</p>
+            ) : (
+                form &&
+                form.formState?.errors &&
+                name in form.formState.errors && (
+                    <ErrorMessage
+                        errors={form.formState.errors}
+                        name={name}
+                        render={({ message }) => <p className={cx("error-message")}>{message}</p>}
+                    />
+                )
+            )}
         </div>
     );
 };

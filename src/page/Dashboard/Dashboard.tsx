@@ -1,6 +1,4 @@
-"use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Dashboard.module.scss";
 import TableCard from "./TableCard";
@@ -10,11 +8,18 @@ import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import Overview from "./components/overview/Overview";
 import ChartOverview from "./components/chart/ChartOverview";
 import ActivityStaff from "./components/activity/ActivityStaff";
-import { routes } from "~/config/routes.config";
+import { routePrivate, routes } from "~/config/routes.config";
+import { useAppDispatch } from "~/redux/hooks";
+// import { getCurrentUser, setUser } from "~/redux/slices/auth.slice";
+import { unwrapResult } from "@reduxjs/toolkit";
+// import httpRequestPrivate from "~/utils/httpRequest";
+// import useHttpRequestPrivate from "~/hooks/useHttpRequestPrivate";
 
 const cx = classNames.bind(styles);
 
 const Dashboard = () => {
+    const dispatch = useAppDispatch();
+    useEffect(() => {}, []);
     const [showAll, setShowAll] = useState(false);
     // Sample contracts data
     const contracts = Array.from({ length: 5 }, (_, index) => ({
@@ -57,7 +62,7 @@ const Dashboard = () => {
 
                 <div className={cx("overview-title")}>
                     <h3>Hợp đồng mới nhất</h3>
-                    <Link to={routes.contractPages}>
+                    <Link to={routePrivate.contractPages}>
                         <FontAwesomeIcon icon={faChevronRight} /> Truy cập
                     </Link>
                 </div>

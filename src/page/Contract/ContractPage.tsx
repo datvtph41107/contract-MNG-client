@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faSearch, faFileContract, faCalendarAlt, faUser, faDollarSign, faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import DateRangePicker from "~/components/DateRangePicker/DateRangePicker";
 import { useContract } from "~/contexts/ContractContext";
-import { routes } from "~/config/routes.config";
+import { routePrivate, routes } from "~/config/routes.config";
 
 const cx = classNames.bind(styles);
 
@@ -116,7 +116,7 @@ const ContractPage = () => {
                     <div className={cx("header-info")}>
                         <p className={cx("subtitle")}>Quản lý và theo dõi tất cả hợp đồng của bạn</p>
                     </div>
-                    <button className={cx("add-button")} onClick={() => navigate(routes.createContract)}>
+                    <button className={cx("add-button")} onClick={() => navigate(routePrivate.createContract)}>
                         <FontAwesomeIcon icon={faPlus} />
                         Tạo hợp đồng mới
                     </button>

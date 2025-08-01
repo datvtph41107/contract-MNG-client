@@ -1,19 +1,12 @@
 import classNames from "classnames/bind";
 import styles from "./Login.module.scss";
-import { useState } from "react";
 import Form from "~/components/Form";
 import Input from "~/components/Input";
-import type { LoginFormValues } from "~/types/LoginFormValues";
+import type { LoginFormValues } from "~/types/auth.types";
 
 const cx = classNames.bind(styles);
 
 const Login = () => {
-    const [activeTab, setActiveTab] = useState<"staff" | "manager">("staff");
-
-    const handleTabClick = (tab: "staff" | "manager") => {
-        setActiveTab(tab);
-    };
-
     const handleSubmit = (data: LoginFormValues) => {
         console.log("Login submitted:", data);
     };
@@ -24,17 +17,8 @@ const Login = () => {
                 <h1 className={cx("logo")}>_contractjob-mng</h1>
             </div>
 
-            <div className={cx("tabs")}>
-                <div className={cx("tab", { active: activeTab === "staff" })} onClick={() => handleTabClick("staff")}>
-                    Nhân viên
-                </div>
-                <div className={cx("tab", { active: activeTab === "manager" })} onClick={() => handleTabClick("manager")}>
-                    Quản lý
-                </div>
-            </div>
-
             <div className={cx("login-container")}>
-                <h1 className={cx("title")}>Chào mừng bạn trở lại!</h1>
+                {/* <h1 className={cx("title")}>Chào mừng bạn trở lại!</h1> */}
                 <Form<LoginFormValues> onSubmit={handleSubmit} defaultValues={{ username: "", password: "" }} className={cx("form")}>
                     <Input
                         name="username"

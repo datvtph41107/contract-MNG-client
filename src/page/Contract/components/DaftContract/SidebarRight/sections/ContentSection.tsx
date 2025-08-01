@@ -7,7 +7,7 @@ import styles from "../SidebarRight.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faChevronUp, faChevronDown, faPlus, faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
 import type { Deliverable } from "~/hooks/useContractForm";
-import { formatDate } from "~/utils/contract.utils";
+import { formatDate } from "~/utils/contract";
 
 const cx = classNames.bind(styles);
 

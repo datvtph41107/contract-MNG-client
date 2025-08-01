@@ -37,9 +37,9 @@ const ControlledFileUploadField: React.FC<ControlledFileUploadFieldProps> = ({
             <Controller
                 name={name}
                 control={control}
-                rules={{
-                    validate: (value: FileAttachment[]) => (value && value.length > 0 ? true : requiredMessage),
-                }}
+                // rules={{
+                //     validate: (value: FileAttachment[]) => (value && value.length > 0 ? true : requiredMessage),
+                // }}
                 render={({ field }) => (
                     <FileUploadSection
                         files={field.value || []}

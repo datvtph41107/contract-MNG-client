@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 import styles from "./Badge.module.scss";
 

@@ -1,37 +1,71 @@
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import { Fragment } from "react";
 import DefaultLayout from "~/layouts/DefaultLayout";
-import { publicRoutes } from "./routes/routes";
+import ProtectedRoute from "~/components/Auth/ProtectedRoute";
+import PublicRoute from "~/components/Auth/PublicRoute";
+import SessionStatus from "~/components/Auth/SessionStatus";
+import { publicRoutes, privateRoutes } from "./routes/routes";
 import NotFound from "./page/404Page";
+import Unauthorized from "./page/Unauthorized";
+import type { PublicRoute as PublicRouteType, PrivateRoute as PrivateRouteType } from "./routes/routes";
+import SessionWarningModal from "./components/Auth/SessionWarningModal";
 
 function App() {
+    const renderRoute = (route: PublicRouteType | PrivateRouteType, index: number, isPrivate = false) => {
+        const Page = route.component;
+        const Layout = route.layout === null ? Fragment : route.layout || DefaultLayout;
+        const Wrapper = isPrivate ? ProtectedRoute : PublicRoute;
+
+        const wrapperProps = isPrivate
+            ? {
+                  access: (route as PrivateRouteType).access,
+                  fallbackPath: route.path.includes("/admin") ? "/admin/login" : "/login",
+              }
+            : {
+                  redirectPath: (route as PublicRouteType).redirectPath,
+                  allowedWhenAuthenticated: (route as PublicRouteType).allowedWhenAuthenticated,
+              };
+
+        return (
+            <Route
+                key={`${isPrivate ? "private" : "public"}-${route.path}`}
+                path={route.path}
+                element={
+                    <Wrapper {...wrapperProps}>
+                        <Layout>
+                            <Page />
+                        </Layout>
+                    </Wrapper>
+                }
+            />
+        );
+    };
+
     return (
         <Router>
             <div className="App">
-                {/* {loading && <LoadingRedirect title="Loading..." />} */}
+                {/* Global Components */}
+                <SessionWarningModal />
+                <SessionStatus />
+
                 <Routes>
-                    {publicRoutes.map((route, index) => {
-                        const Page = route.component;
-                        let Layout = DefaultLayout;
+                    {/* Public Routes */}
+                    {publicRoutes.map((route, index) => renderRoute(route, index))}
 
-                        if (route.layout) {
-                            Layout = route.layout;
-                        } else if (route.layout === null) {
-                            Layout = Fragment;
+                    {/* Private Routes */}
+                    {privateRoutes.map((route, index) => renderRoute(route, index, true))}
+
+                    {/* Unauthorized */}
+                    <Route
+                        path="/unauthorized"
+                        element={
+                            <DefaultLayout>
+                                <Unauthorized />
+                            </DefaultLayout>
                         }
+                    />
 
-                        return (
-                            <Route
-                                key={index}
-                                path={route.path}
-                                element={
-                                    <Layout>
-                                        <Page />
-                                    </Layout>
-                                }
-                            />
-                        );
-                    })}
+                    {/* 404 Page */}
                     <Route
                         path="*"
                         element={
@@ -45,4 +79,5 @@ function App() {
         </Router>
     );
 }
+
 export default App;

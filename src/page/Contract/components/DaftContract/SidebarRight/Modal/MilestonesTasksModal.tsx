@@ -21,11 +21,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import BaseModal from "./BaseModal";
 import SidebarDropdown from "../../../Dropdown/Dropdown";
-import DatePicker from "../../../DatePicker/DatePicker";
-import type { Milestone, Task } from "~/types/milestones";
-import { milestoneTypes, priorityOptions, defaultNotificationDays } from "~/types/milestones";
+import DatePicker from "../../../../../../components/DateRangePicker/DatePicker/DatePicker";
 import classNames from "classnames/bind";
 import styles from "./MilestonesTasksModal.module.scss";
+import type { Milestone, Task } from "~/types/contract.types";
 
 const cx = classNames.bind(styles);
 

@@ -1,28 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom"; // Import react-router-dom hooks
+import { useNavigate } from "react-router-dom";
 import ProgressBarHeader from "./components/ProgressBarHeader/ProgressBarHeader";
 import Stage1Draft from "./components/stages/StageDraft";
-// import Stage2Parties from "./components/stages/StageParties";
-import Stage3Milestones from "./components/stages/Milestones/StageMilestones";
-import Stage4Preview from "./components/stages/StagePreview";
+import Stage2Milestones from "./components/stages/Milestones/StageMilestones";
+import Stage4Preview from "./components/stages/PreviewContract/StagePreview";
 import { useContractStore } from "~/store/contract-store";
 import styles from "./ContractDaft.module.scss";
 import classNames from "classnames/bind";
-import { routes } from "~/config/routes.config";
+import { routePrivate, routes } from "~/config/routes.config";
 
 const cx = classNames.bind(styles);
 
 const ContractDaft = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const params = new URLSearchParams(location.search);
-    const currentStage = Number.parseInt(params.get("stage") || "1");
-    const currentContractType = params.get("type") || "basic";
-    const { validateStep } = useContractStore();
+    const { currentStep, goToStep, validateStep, formData } = useContractStore();
 
     const [isVisible, setIsVisible] = useState(true);
     const [isAtTop, setIsAtTop] = useState(true);
-
     const lastScrollYRef = useRef(0);
     const tickingRef = useRef(false);
     const isVisibleRef = useRef(true);
@@ -33,7 +27,6 @@ const ContractDaft = () => {
         const scrollThreshold = 100;
         const atTop = currentScrollY <= scrollThreshold;
 
-        // Check if isAtTop has changed
         if (atTop !== isAtTopRef.current) {
             setIsAtTop(atTop);
             isAtTopRef.current = atTop;
@@ -74,37 +67,36 @@ const ContractDaft = () => {
         };
 
         window.addEventListener("scroll", onScroll, { passive: true });
-
         return () => {
             window.removeEventListener("scroll", onScroll);
         };
     }, []);
 
     useEffect(() => {
-        if (currentStage < 1 || currentStage > 4) {
-            navigate(`/${routes.createContract}?stage=1`);
+        if (currentStep < 1 || currentStep > 4) {
+            goToStep(1);
+            navigate(`/${routePrivate.createContract}`);
         }
-    }, [currentStage, navigate]);
+    }, [currentStep, goToStep, navigate]);
 
     useEffect(() => {
-        if (currentStage > 1) {
-            for (let i = 1; i < currentStage; i++) {
+        if (currentStep > 1) {
+            for (let i = 1; i < currentStep; i++) {
                 if (!validateStep(i)) {
-                    navigate(`/${routes.createContract}?stage=${i}`);
+                    goToStep(i);
+                    navigate(`/${routePrivate.createContract}`);
                     return;
                 }
             }
         }
-    }, [currentStage, validateStep, navigate]);
+    }, [currentStep, validateStep, goToStep, navigate]);
 
     const renderStage = () => {
-        switch (currentStage) {
+        switch (currentStep) {
             case 1:
                 return <Stage1Draft />;
-            // case 2:
-            //     return <Stage2Parties />;
             case 2:
-                return <Stage3Milestones />;
+                return <Stage2Milestones />;
             case 3:
                 return <Stage4Preview />;
             default:
@@ -114,7 +106,7 @@ const ContractDaft = () => {
 
     return (
         <div className={cx("wrapper", { collapse: isVisible })}>
-            {currentContractType === "editor" && <ProgressBarHeader currentStage={currentStage} isVisible={isVisible} isAtTop={isAtTop} />}
+            {formData.mode === "editor" && <ProgressBarHeader currentStage={currentStep} isVisible={isVisible} isAtTop={isAtTop} />}
             <div className={cx("container")}>{renderStage()}</div>
         </div>
     );
