@@ -88,6 +88,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, access, fallb
                 console.log("[ProtectedRoute] Initialization completed successfully");
             } catch (err) {
                 console.error("[ProtectedRoute] Initialization failed:", err);
+
+                // Check if it's a network error (backend not available)
+                const errorMessage = err?.toString() || "";
+                if (errorMessage.includes("Network Error") || errorMessage.includes("Failed to fetch") || errorMessage.includes("connect")) {
+                    console.warn("[ProtectedRoute] Backend API is not available - redirecting to login");
+                } else {
+                    console.error("[ProtectedRoute] Authentication error:", err);
+                }
+
                 dispatch(clearAuth({}));
             } finally {
                 setIsInitializing(false);
