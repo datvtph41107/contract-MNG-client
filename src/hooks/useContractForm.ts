@@ -1,8 +1,12 @@
 import { useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useContractStore } from "~/store/contract-store";
+import { useDraftStore } from "~/store/contract-draft-store";
 import type { ContractFormData, Milestone } from "~/types/contract.types";
 
 export const useContractForm = () => {
+    const navigate = useNavigate();
+
     const {
         formData,
         currentStep,
@@ -11,8 +15,8 @@ export const useContractForm = () => {
         lastSavedAt,
         updateFormData,
         goToStep,
-        nextStep,
-        prevStep,
+        nextStep: storeNextStep,
+        prevStep: storePrevStep,
         validateStep,
         canAccessStep,
         getStepProgress,
@@ -20,43 +24,59 @@ export const useContractForm = () => {
         setMilestones,
         markFormClean,
         hasUnsavedChanges,
+        saveAsDraft,
+        getCurrentDraftId,
+        loadFromDraft,
     } = useContractStore();
+
+    const { currentDraft, setCurrentDraft } = useDraftStore();
 
     // Auto-save functionality
     useEffect(() => {
-        if (isFormDirty) {
-            const autoSaveTimer = setTimeout(() => {
-                console.log("💾 Auto-saving form data...");
-                markFormClean();
-            }, 2000); // Auto-save after 2 seconds of inactivity
+        if (isFormDirty && getCurrentDraftId()) {
+            const autoSaveTimer = setTimeout(async () => {
+                try {
+                    console.log("💾 Auto-saving form data...");
+                    await saveAsDraft();
+                    console.log("✅ Auto-save completed");
+                } catch (error) {
+                    console.error("❌ Auto-save failed:", error);
+                }
+            }, 3000); // Auto-save after 3 seconds of inactivity
 
             return () => clearTimeout(autoSaveTimer);
         }
-    }, [isFormDirty, markFormClean]);
+    }, [isFormDirty, saveAsDraft, getCurrentDraftId]);
 
-    // Navigation with validation
-    const handleNextStep = useCallback(() => {
-        const result = nextStep();
-        if (!result.success) {
-            // Handle validation error
-            console.error("Cannot proceed to next step:", result.error);
-            return {
-                success: false,
-                message: "Vui lòng hoàn thành tất cả thông tin bắt buộc trước khi tiếp tục.",
-            };
+    // Load draft data on mount if coming from collection
+    useEffect(() => {
+        if (currentDraft && !formData.name) {
+            loadFromDraft(currentDraft.id);
         }
-        return { success: true, step: result.step };
-    }, [nextStep]);
+    }, [currentDraft, formData.name, loadFromDraft]);
 
-    const handlePrevStep = useCallback(() => {
-        const result = prevStep();
-        return { success: result.success, step: result.step };
-    }, [prevStep]);
+    // Navigation with validation and URL updates
+    const nextStep = useCallback(() => {
+        const result = storeNextStep();
+        if (result.success) {
+            navigate(`/page/create/daft?stage=${result.step}`);
+        }
+        return result;
+    }, [storeNextStep, navigate]);
 
-    const handleJumpToStep = useCallback(
+    const prevStep = useCallback(() => {
+        const result = storePrevStep();
+        if (result.success) {
+            navigate(`/page/create/daft?stage=${result.step}`);
+        }
+        return result;
+    }, [storePrevStep, navigate]);
+
+    const jumpToStep = useCallback(
         (step: number) => {
             if (canAccessStep(step)) {
                 goToStep(step);
+                navigate(`/page/create/daft?stage=${step}`);
                 return { success: true, step };
             }
             return {
@@ -64,10 +84,10 @@ export const useContractForm = () => {
                 message: `Không thể truy cập bước ${step}. Vui lòng hoàn thành các bước trước đó.`,
             };
         },
-        [canAccessStep, goToStep],
+        [canAccessStep, goToStep, navigate],
     );
 
-    // Form data helpers
+    // Form data helpers with auto-save trigger
     const updateStep1Data = useCallback(
         (data: Partial<ContractFormData>) => {
             setStep1Data(data);
@@ -80,6 +100,28 @@ export const useContractForm = () => {
             setMilestones(milestones);
         },
         [setMilestones],
+    );
+
+    // Manual save as draft
+    const saveCurrentAsDraft = useCallback(
+        async (name?: string) => {
+            try {
+                const draftId = await saveAsDraft(name);
+
+                // Update current draft in draft store
+                if (!currentDraft) {
+                    // If no current draft, we need to fetch the created draft
+                    // This would typically be handled by the draft store
+                    console.log("Draft saved with ID:", draftId);
+                }
+
+                return { success: true, draftId };
+            } catch (error) {
+                console.error("Failed to save as draft:", error);
+                return { success: false, error: "Không thể lưu bản nháp" };
+            }
+        },
+        [saveAsDraft, currentDraft],
     );
 
     // Progress tracking
@@ -100,9 +142,9 @@ export const useContractForm = () => {
         hasUnsavedChanges: hasUnsavedChanges(),
 
         // Navigation methods
-        nextStep: handleNextStep,
-        prevStep: handlePrevStep,
-        jumpToStep: handleJumpToStep,
+        nextStep,
+        prevStep,
+        jumpToStep,
         canAccessStep,
 
         // Data update methods
@@ -118,5 +160,10 @@ export const useContractForm = () => {
             if (!lastSavedAt) return null;
             return new Date(lastSavedAt).toLocaleString("vi-VN");
         },
+
+        // Draft integration
+        saveCurrentAsDraft,
+        currentDraftId: getCurrentDraftId(),
+        currentDraft,
     };
 };

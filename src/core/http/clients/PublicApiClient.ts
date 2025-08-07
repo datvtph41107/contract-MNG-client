@@ -19,7 +19,7 @@ export class PublicApiClient extends BaseApiClient {
                 return response;
             },
             (error) => {
-                return Promise.reject(this.normalizeError?.(error) ?? error);
+                return Promise.reject(this.error?.(error) ?? error);
             },
         );
     }

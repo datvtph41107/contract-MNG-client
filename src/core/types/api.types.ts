@@ -11,7 +11,7 @@ export interface RequestParams {
     [key: string]: string | number | boolean | undefined;
 }
 
-export type ApiMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+export type ApiMethod = "get" | "post" | "put" | "patch" | "delete";
 
 export interface ApiResponse<T> {
     status: number;

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { ContractFormData, ContractState, Milestone } from "~/types/contract.types";
+import type { ContractFormData, ContractState } from "~/types/contract.types";
 
 const defaultState: ContractFormData = {
     name: "",
@@ -12,7 +12,7 @@ const defaultState: ContractFormData = {
     dateRange: { startDate: null, endDate: null },
     details: { description: "" },
     structuredData: {},
-    milestones: [],
+    milestones: [], // Initialize empty milestones array
     notificationSettings: {
         contractNotifications: [],
         milestoneNotifications: [],
@@ -76,7 +76,7 @@ export const useContractStore = create<ContractState>()(
                 }));
             },
 
-            // Validation
+            // Enhanced validation with milestone support
             validateStep: (step) => {
                 const { formData } = get();
                 console.log(`🔍 Validating step ${step}:`, formData);
@@ -84,7 +84,25 @@ export const useContractStore = create<ContractState>()(
                 const validations: Record<number, () => boolean> = {
                     1: () => {
                         // Basic contract info validation
-                        const isValid = !!(formData.name?.trim() && formData.contractType && formData.details?.description?.trim());
+                        const isValid = !!(
+                            formData.name?.trim() &&
+                            formData.contractType &&
+                            formData.drafter?.trim() &&
+                            formData.manager?.trim()
+                        );
+
+                        // Additional validation based on mode
+                        if (formData.mode === "basic") {
+                            const basicData = formData as any;
+                            return isValid && !!basicData.details?.description?.trim();
+                        } else if (formData.mode === "editor") {
+                            const editorData = formData as any;
+                            return isValid && !!editorData.editorContent?.plainText?.trim();
+                        } else if (formData.mode === "upload") {
+                            const uploadData = formData as any;
+                            return isValid && !!uploadData.uploadedFile?.fileUrl;
+                        }
+
                         console.log(`Step 1 validation result: ${isValid}`);
                         return isValid;
                     },
@@ -98,16 +116,21 @@ export const useContractStore = create<ContractState>()(
                                     milestone.name?.trim() &&
                                     milestone.description?.trim() &&
                                     milestone.priority &&
-                                    milestone.assignee?.trim(),
+                                    milestone.assignee?.trim() &&
+                                    milestone.dateRange.startDate &&
+                                    milestone.dateRange.endDate,
                             );
                         console.log(`Step 2 validation result: ${isValid}, Milestones count: ${formData.milestones.length}`);
                         return isValid;
                     },
 
                     3: () => {
-                        // Preview step - always valid if previous steps are complete
-                        console.log("Step 3 validation - preview step");
-                        return true;
+                        // Preview step - validate all previous steps are complete
+                        const step1Valid = validations[1]();
+                        const step2Valid = validations[2]();
+                        const isValid = step1Valid && step2Valid;
+                        console.log(`Step 3 validation - step1: ${step1Valid}, step2: ${step2Valid}, result: ${isValid}`);
+                        return isValid;
                     },
                 };
 
@@ -213,6 +236,10 @@ export const useContractStore = create<ContractState>()(
             version: 1,
             migrate: (persistedState: any, version) => {
                 console.log("🔄 Migrating persisted state from version", version);
+                // Ensure milestones array exists in migrated data
+                if (persistedState.formData && !persistedState.formData.milestones) {
+                    persistedState.formData.milestones = [];
+                }
                 return persistedState;
             },
         },

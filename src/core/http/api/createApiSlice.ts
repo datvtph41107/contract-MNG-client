@@ -1,8 +1,7 @@
 import type { SliceCaseReducers } from "@reduxjs/toolkit";
 import { BaseApiSliceBuilder, type ApiSliceConfig, type BaseApiState } from "./BaseApiSliceBuilder";
 
-// ✅ Helper function to create base API state
-export function createBaseApiState<T = {}>(additionalState?: T): BaseApiState & T {
+export function createBaseApiState<T>(additionalState?: T): BaseApiState & T {
     return {
         loading: false,
         error: null,
@@ -10,7 +9,6 @@ export function createBaseApiState<T = {}>(additionalState?: T): BaseApiState & 
     } as BaseApiState & T;
 }
 
-// ✅ Main createApiSlice function using BaseApiSliceBuilder
 export function createApiSlice<TState extends BaseApiState, TReducers extends SliceCaseReducers<TState>>(
     config: ApiSliceConfig<TState, TReducers>,
 ) {
@@ -18,5 +16,4 @@ export function createApiSlice<TState extends BaseApiState, TReducers extends Sl
     return builder.buildSlice();
 }
 
-// ✅ Export BaseApiState for convenience
 export type { BaseApiState } from "./BaseApiSliceBuilder";
